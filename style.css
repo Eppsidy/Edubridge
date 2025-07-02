@@ -1,0 +1,259 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg,  #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: #2dd4bf;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.logo-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+
+.header-btn {
+    background: linear-gradient(45deg, #008080, #20b2aa);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 128, 128, 0.3);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 128, 128, 0.4);
+}
+
+/* Specific header button variations */
+.sell-btn {
+    background: linear-gradient(45deg, #008080, #20b2aa);
+}
+
+.logout-btn {
+    background: linear-gradient(45deg, #ef4444, #dc2626);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.logout-btn:hover {
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+
+.nav-tabs {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 0;
+    display: flex;
+    overflow-x: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.nav-tabs a {
+    display: block;
+    color: #666;
+    text-decoration: none;
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    position: relative;
+}
+
+.nav-tabs a:hover {
+    background: rgba(0, 128, 128, 0.1);
+    color: #008080;
+    border-bottom-color: rgba(0, 128, 128, 0.3);
+}
+
+.nav-tabs a.active {
+    background: #008080;
+    color: white;
+    border-bottom-color: #2dd4bf;
+    box-shadow: 0 2px 8px rgba(0, 128, 128, 0.2);
+}
+
+/* Active state glow effect */
+.nav-tabs a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #14b8a6);
+    border-radius: 2px 2px 0 0;
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 0.75rem 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .logo-container {
+        gap: 8px;
+    }
+    
+    .logo-text {
+        font-size: 20px;
+    }
+    
+    .logo-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+    
+    .header-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+    
+    .nav-tabs {
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #2dd4bf transparent;
+    }
+    
+    .nav-tabs::-webkit-scrollbar {
+        height: 3px;
+    }
+    
+    .nav-tabs::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .nav-tabs::-webkit-scrollbar-thumb {
+        background: #2dd4bf;
+        border-radius: 3px;
+    }
+    
+    .nav-tabs a {
+        padding: 0.875rem 1.25rem;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 0.5rem;
+    }
+    
+    .logo-text {
+        font-size: 18px;
+    }
+    
+    .header-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
+
+
+.nav-hidden {
+    display: none;
+}
+
+.nav-visible {
+    display: flex;
+}
+
+/* For pages that might need different nav behavior */
+.nav-tabs.compact a {
+    padding: 0.75rem 1rem;
+}
+
+.nav-tabs.large a {
+    padding: 1.25rem 2rem;
+}
+
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.header {
+    animation: slideIn 0.5s ease-out;
+}
+
+.nav-tabs a {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus states for accessibility */
+.nav-tabs a:focus,
+.header-btn:focus {
+    outline: 2px solid #2dd4bf;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .nav-tabs a.active {
+        background: #000;
+        color: #fff;
+        border-bottom-color: #fff;
+    }
+    
+    .header-btn {
+        border: 2px solid currentColor;
+    }
+}
