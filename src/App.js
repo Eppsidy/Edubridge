@@ -1,14 +1,57 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// App.js
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { supabase } from './lib/supabaseClient';
 import Login from './pages/Login';
 import Home from './pages/Home';
+import './App.css';
 
 function App() {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Get initial session
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      setLoading(false);
+    };
+
+    getSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/home" element={<Home />} />
-      </Routes>
+      <div className="App">
+        <Routes>
+          <Route path="/login" element={session ? <Navigate to="/" /> : <Login />} />
+          <Route path="/" element={session ? <Home session={session} /> : <Navigate to="/login" />} />
+          <Route path="/dashboard" element={session ? <div>User Dashboard - Coming Soon</div> : <Navigate to="/login" />} />
+          <Route path="/market" element={session ? <div>Textbook Market - Coming Soon</div> : <Navigate to="/login" />} />
+          <Route path="/cart" element={session ? <div>Cart - Coming Soon</div> : <Navigate to="/login" />} />
+          <Route path="/sale" element={session ? <div>Sale - Coming Soon</div> : <Navigate to="/login" />} />
+        </Routes>
+      </div>
     </Router>
   );
 }
