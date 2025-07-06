@@ -43,8 +43,8 @@ const Home = ({ session }) => {
 
   const navigateTo = (page) => {
     const routes = {
-      'Home': '/',
-      'User Dashboard': '/dashboard',
+      'Home': '/home',
+      'UserDashboard': '/userdashboard',
       'Textbook Market': '/market',
       'Cart': '/cart',
       'Sale': '/sale'
@@ -76,7 +76,7 @@ const Home = ({ session }) => {
         <a href="#" className="active" onClick={(e) => { e.preventDefault(); navigateTo('Home'); }}>
           Home
         </a>
-        <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('User Dashboard'); }}>
+        <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('UserDashboard'); }}>
           User Dashboard
         </a>
         <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('Textbook Market'); }}>
