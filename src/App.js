@@ -45,7 +45,8 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/login" element={session ? <Navigate to="/home" /> : <Login />} />
+          <Route path="/login" element={session ? <Navigate to="/userdashboard" /> : <Login />} />
+          <Route path="/" element={session ? <Home session={session} /> : <Navigate to="/login" />} />   {/* <-- Add this line */}
           <Route path="/home" element={session ? <Home session={session} /> : <Navigate to="/login" />} />
           <Route path="/userdashboard" element={session ? <UserDashboard session={session} /> : <Navigate to="/login" />} />
           <Route path="/market" element={session ? <div>Textbook Market - Coming Soon</div> : <Navigate to="/login" />} />
