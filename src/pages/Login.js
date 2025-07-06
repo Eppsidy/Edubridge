@@ -32,7 +32,7 @@ function Login() {
           <p className="logo-subtitle">Your Student-Powered Learning Hub</p>
         </div>
         
-        <h2 className="auth-title">Welcome Back</h2>
+        <h2 className="auth-title"></h2>
         
         <Auth
           supabaseClient={supabase}
@@ -56,13 +56,13 @@ function Login() {
                 email_label: 'Email Address',
                 password_label: 'Password',
                 button_label: 'Sign In',
-                link_text: "Don't have an account? Sign up"
+                link_text: 'Already have an account? Sign in'
               },
               sign_up: {
                 email_label: 'Email Address',
                 password_label: 'Create Password',
                 button_label: 'Create Account',
-                link_text: 'Already have an account? Sign in'
+                link_text: "Don't have an account? Sign up"
               }
             }
           }}
