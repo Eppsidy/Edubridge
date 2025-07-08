@@ -5,6 +5,8 @@ import { supabase } from './lib/supabaseClient';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import UserDashboard from './pages/UserDashboard';
+import TextbookMarket from './pages/TextbookMarket';
+import Addbook from './pages/Addbook';
 import './App.css';
 
 function App() {
@@ -49,7 +51,8 @@ function App() {
           <Route path="/" element={session ? <Home session={session} /> : <Navigate to="/login" />} />   {/* <-- Add this line */}
           <Route path="/home" element={session ? <Home session={session} /> : <Navigate to="/login" />} />
           <Route path="/userdashboard" element={session ? <UserDashboard session={session} /> : <Navigate to="/login" />} />
-          <Route path="/market" element={session ? <div>Textbook Market - Coming Soon</div> : <Navigate to="/login" />} />
+          <Route path="/textbookmarket" element={session ? <TextbookMarket session={session} /> : <Navigate to="/login" />} />
+          <Route path="/addbook" element={session ? <Addbook session={session} /> : <Navigate to="/login" />} />
           <Route path="/cart" element={session ? <div>Cart - Coming Soon</div> : <Navigate to="/login" />} />
           <Route path="/sale" element={session ? <div>Sale - Coming Soon</div> : <Navigate to="/login" />} />
         </Routes>

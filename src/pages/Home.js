@@ -1,6 +1,7 @@
 // Home.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import '../styles/Home.css';
 
@@ -73,15 +74,11 @@ const Home = ({ session }) => {
       </header>
 
       <nav className="nav-tabs">
-        <a href="#" className="active" onClick={(e) => { e.preventDefault(); navigateTo('Home'); }}>
-          Home
-        </a>
-        <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('UserDashboard'); }}>
-          User Dashboard
-        </a>
-        <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('Textbook Market'); }}>
-          Textbook Market
-        </a>
+        <Link to="/home" className="active">Home</Link>
+
+        <Link to="/userdashboard">Dashboard</Link>
+        <Link to="/textbookmarket">Textbook Market</Link>
+
         <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('Cart'); }}>
           Cart
         </a>
