@@ -478,9 +478,10 @@ const ShoppingCartPage = ({ session }) => {
                   ))}
                 </div>
                 
-                <a href="/textbookmarket" className="continue-shopping">
+                {/* Replace this line in the main component */}
+                <Link to="/textbookmarket" className="continue-shopping">
                   ← Continue Shopping
-                </a>
+                </Link>
               </>
             )}
           </div>

@@ -32,30 +32,46 @@ const AddBook = ({ session }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data, error } = await supabase
-          .from('categories')
-          .select('id, name')
-          .order('name');
+        // Create categories if they don't exist
+        const defaultCategories = [
+          'Computer Science',
+          'Mathematics',
+          'Physics',
+          'Chemistry',
+          'Biology',
+          'Engineering',
+          'Business',
+          'Psychology',
+          'History',
+          'Literature',
+          'Economics',
+          'Other'
+        ];
 
-        if (error) throw error;
-        setCategories(data || []);
+        // First, check if categories exist
+        const { data: existingCategories, error: fetchError } = await supabase
+          .from('categories')
+          .select('*');
+
+        if (fetchError) throw fetchError;
+
+        if (!existingCategories || existingCategories.length === 0) {
+          // Insert default categories if none exist
+          const { data, error: insertError } = await supabase
+            .from('categories')
+            .insert(
+              defaultCategories.map(name => ({ name }))
+            )
+            .select();
+
+          if (insertError) throw insertError;
+          setCategories(data);
+        } else {
+          setCategories(existingCategories);
+        }
       } catch (err) {
-        console.error('Error fetching categories:', err);
-        // Fallback categories if database fetch fails
-        setCategories([
-          { id: 1, name: 'Computer Science' },
-          { id: 2, name: 'Mathematics' },
-          { id: 3, name: 'Physics' },
-          { id: 4, name: 'Chemistry' },
-          { id: 5, name: 'Biology' },
-          { id: 6, name: 'Engineering' },
-          { id: 7, name: 'Business' },
-          { id: 8, name: 'Psychology' },
-          { id: 9, name: 'History' },
-          { id: 10, name: 'Literature' },
-          { id: 11, name: 'Economics' },
-          { id: 12, name: 'Other' }
-        ]);
+        console.error('Error with categories:', err);
+        setError('Error loading categories. Please try again.');
       }
     };
 
@@ -133,6 +149,7 @@ const AddBook = ({ session }) => {
           publication_year: form.publication_year ? parseInt(form.publication_year) : null,
           category_id: form.category_id ? parseInt(form.category_id) : null,
           seller_id: userProfile.id,
+          price: parseFloat(form.selling_price), // Add this line
           original_price: parseFloat(form.selling_price),
           selling_price: parseFloat(form.selling_price),
           condition_rating: form.condition_rating,

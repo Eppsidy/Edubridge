@@ -75,16 +75,10 @@ const Home = ({ session }) => {
 
       <nav className="nav-tabs">
         <Link to="/home" className="active">Home</Link>
-
         <Link to="/userdashboard">Dashboard</Link>
         <Link to="/textbookmarket">Textbook Market</Link>
-
-        <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('Cart'); }}>
-          Cart
-        </a>
-        <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('Sale'); }}>
-          Sale
-        </a>
+        <Link to="/cart">Cart</Link>
+        <Link to="/sale">Sale</Link>
       </nav>
 
       <div className="hero-section">

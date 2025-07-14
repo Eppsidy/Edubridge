@@ -7,6 +7,8 @@ import Home from './pages/Home';
 import UserDashboard from './pages/UserDashboard';
 import TextbookMarket from './pages/TextbookMarket';
 import Addbook from './pages/Addbook';
+import Cart from './pages/Cart';
+
 import './App.css';
 
 function App() {
@@ -53,8 +55,7 @@ function App() {
           <Route path="/userdashboard" element={session ? <UserDashboard session={session} /> : <Navigate to="/login" />} />
           <Route path="/textbookmarket" element={session ? <TextbookMarket session={session} /> : <Navigate to="/login" />} />
           <Route path="/addbook" element={session ? <Addbook session={session} /> : <Navigate to="/login" />} />
-          <Route path="/cart" element={session ? <div>Cart - Coming Soon</div> : <Navigate to="/login" />} />
-          <Route path="/sale" element={session ? <div>Sale - Coming Soon</div> : <Navigate to="/login" />} />
+          <Route path="/cart" element={session ? <Cart session={session} /> : <Navigate to="/login" />} />
         </Routes>
       </div>
     </Router>

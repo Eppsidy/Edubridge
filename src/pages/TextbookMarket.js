@@ -67,14 +67,7 @@ const Navigation = ({ activeTab, setActiveTab }) => {
       <Link to="/home">Home</Link>
       <Link to="/userdashboard">Dashboard</Link>
       <Link to="/textbookmarket" className="active">Textbook Market</Link>
-      <a 
-        href="#" 
-        onClick={(e) => { e.preventDefault(); navigateTo('cart'); }} 
-        className={activeTab === 'cart' ? 'active' : ''}
-      >
-        <ShoppingCart size={16} />
-        Cart
-      </a>
+      <Link to="/cart">Cart</Link>
       <a 
         href="#" 
         onClick={(e) => { e.preventDefault(); navigateTo('sale'); }} 
@@ -122,8 +115,13 @@ const BookCard = ({ book, onBuyNow }) => (
     <div className="book-title">{book.title}</div>
     <div className="book-author">by {book.author}</div>
     <div className="book-details">
-      <div className="book-price"> {book.price != null ? `R${book.price.toFixed(2)}` : 'Price not set'} </div>
-      <div className="book-condition">{book.condition}</div>
+      <div className="book-price">
+        {(book.selling_price || book.price) != null 
+          ? `R${(book.selling_price || book.price).toFixed(2)}` 
+          : 'Price not set'
+        }
+      </div>
+      <div className="book-condition">{book.condition_rating}</div>
     </div>
     <div className="book-seller">
       Sold by: {book.seller} ({book.sellerCourse})
@@ -203,7 +201,8 @@ const TextbookMarket = ({ session }) => {
           ...book,
           seller: book.users ? `${book.users.first_name} ${book.users.last_name}` : 'Unknown Seller',
           sellerCourse: book.users?.course_of_study || 'Unknown Course',
-          course: book.categories?.name || 'Other'
+          course: book.categories?.name || 'Other',
+          price: book.selling_price || book.price // Use either selling_price or price
         }));
 
         setBooks(transformedBooks);
@@ -238,11 +237,26 @@ const TextbookMarket = ({ session }) => {
     }
 
     try {
+      // Get the user's profile ID first
+      const { data: userProfile, error: profileError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_id', session.user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      if (!userProfile) {
+        alert('User profile not found. Please complete your profile first.');
+        navigate('/userdashboard');
+        return;
+      }
+
       // Check if book is already in cart
       const { data: existingCart, error: checkError } = await supabase
         .from('cart')
         .select('*')
-        .eq('user_id', session.user.id)
+        .eq('user_id', userProfile.id)  // Use profile ID instead of auth ID
         .eq('book_id', book.id)
         .single();
 
@@ -251,26 +265,30 @@ const TextbookMarket = ({ session }) => {
       }
 
       if (existingCart) {
-        alert('This book is already in your cart!');
-        navigate('/cart');
+        const goToCart = window.confirm('This book is already in your cart. Would you like to view your cart?');
+        if (goToCart) {
+          navigate('/cart');
+        }
         return;
       }
 
-      // Add to cart
-      const { error } = await supabase
+      // Add to cart using the user's profile ID
+      const { error: insertError } = await supabase
         .from('cart')
         .insert([
           {
-            user_id: session.user.id,
+            user_id: userProfile.id,  // Use profile ID instead of auth ID
             book_id: book.id,
             quantity: 1
           }
         ]);
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
-      alert(`${book.title} added to cart!`);
-      navigate('/cart');
+      const goToCart = window.confirm(`${book.title} added to cart! Would you like to view your cart?`);
+      if (goToCart) {
+        navigate('/cart');
+      }
     } catch (error) {
       console.error('Error adding to cart:', error);
       alert('Error adding book to cart. Please try again.');
