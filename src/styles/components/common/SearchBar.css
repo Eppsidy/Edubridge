@@ -1,0 +1,18 @@
+.search-bar {
+  max-width: 600px;
+  margin: var(--spacing-lg) auto;
+  position: relative;
+}
+
+.search-input {
+  /* Input styles are handled by Input.css */
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .search-bar {
+    max-width: 100%;
+    margin: var(--spacing-sm) 0;
+    padding: 0 8px;
+  }
+}

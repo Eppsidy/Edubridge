@@ -1,0 +1,33 @@
+.input-container {
+  position: relative;
+  transition: transform var(--transition-normal);
+}
+
+.input-container.focused {
+  transform: scale(1.02);
+}
+
+.input-field {
+  width: 100%;
+  padding: 15px 25px;
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: 1.1rem;
+  box-shadow: var(--shadow-md);
+  outline: none;
+  transition: all var(--transition-normal);
+}
+
+.input-field:focus {
+  box-shadow: 0 8px 30px rgba(0, 128, 128, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .input-field {
+    font-size: 1rem;
+    padding: 12px 16px;
+    border-radius: 30px;
+  }
+}

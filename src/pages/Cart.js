@@ -32,14 +32,8 @@ const Navigation = ({ activeTab }) => {
       <Link to="/home">Home</Link>
       <Link to="/userdashboard">Dashboard</Link>
       <Link to="/textbookmarket">Textbook Market</Link>
-      <Link to="/cart" className="active">
-        <ShoppingCart size={16} />
-        Cart
-      </Link>
-      <Link to="/sale">
-        <DollarSign size={16} />
-        Sale
-      </Link>
+      <Link to="/cart" className="active">Cart</Link>
+      <Link to="/sale">Sale</Link>
     </nav>
   );
 };
