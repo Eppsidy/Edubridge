@@ -23,7 +23,7 @@ const Home = ({ session }) => {
     <div className="home-container">
       <Header user={user} userName={userName} />
       <Navigation activeTab="Home" />
-      <div className="content-wrapper">
+      <div className="content-wrapper content-card">
         <HeroSection 
           userName={userName} 
           onLogout={handleLogout}
