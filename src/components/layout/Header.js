@@ -1,6 +1,6 @@
 import React from 'react';
 import UserInfo from '../common/UserInfo';
-import '../styles/components/layout/Header.css';
+import '../../styles/components/layout/Header.css';
 
 const Header = ({ user, userName }) => {
   return (

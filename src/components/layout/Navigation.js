@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/components/layout/Navigation.css';
+import '../../styles/components/layout/Navigation.css';
 
 const Navigation = ({ activeTab = 'Home' }) => {
   const navItems = [

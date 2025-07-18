@@ -7,7 +7,7 @@ import FeaturesSection from '../components/sections/FeaturesSection';
 import Footer from '../components/layout/Footer';
 import { useAuth } from '../hooks/useAuth';
 import { useSearch } from '../hooks/useSearch';
-import '../styles/pages/Home.css';
+import '../styles/Home.css';
 
 const Home = ({ session }) => {
   const navigate = useNavigate();
@@ -23,12 +23,14 @@ const Home = ({ session }) => {
     <div className="home-container">
       <Header user={user} userName={userName} />
       <Navigation activeTab="Home" />
-      <HeroSection 
-        userName={userName} 
-        onLogout={handleLogout}
-        onSearch={handleSearch}
-      />
-      <FeaturesSection />
+      <div className="content-wrapper">
+        <HeroSection 
+          userName={userName} 
+          onLogout={handleLogout}
+          onSearch={handleSearch}
+        />
+        <FeaturesSection />
+      </div>
       <Footer />
     </div>
   );

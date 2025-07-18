@@ -2,7 +2,7 @@ import React from 'react';
 import Card from '../ui/Card';
 import SearchBar from '../common/SearchBar';
 import Button from '../ui/Button';
-import '../styles/components/sections/HeroSection.css';
+import '../../styles/components/sections/HeroSection.css';
 
 const HeroSection = ({ userName, onLogout, onSearch }) => {
   return (

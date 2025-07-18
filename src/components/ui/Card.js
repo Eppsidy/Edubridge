@@ -1,5 +1,4 @@
 import React from 'react';
-import '../styles/components/ui/Card.css';
 
 const Card = ({ children, className = '', variant = 'default' }) => {
   return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import Card from '../ui/Card';
-import '../styles/components/sections/FeaturesSection.css';
+import '../../styles/components/sections/FeaturesSection.css';
 
 const FeatureCard = ({ title, imageUrl, features }) => (
   <Card variant="feature">
