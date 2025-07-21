@@ -168,7 +168,7 @@ const UserDashboard = ({ session }) => {
     }
   };
 
-  {
+  const renderContent = () => {
     if (loading) {
       return <div className="loading">Loading your dashboard...</div>;
     }
