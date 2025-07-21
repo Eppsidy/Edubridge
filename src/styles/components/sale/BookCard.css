@@ -1,0 +1,109 @@
+.book-card {
+  border: 2px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+}
+
+.book-status {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.status-available {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.status-sold {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+
+.book-header {
+  margin-bottom: 16px;
+}
+
+.book-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.book-author {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.book-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.btn-edit:hover {
+  background: #e5e7eb;
+}
+
+.btn-delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.btn-delete:hover {
+  background: #fecaca;
+}
+
+.book-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.detail-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+}

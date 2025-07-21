@@ -1,4 +1,5 @@
 import React from 'react';
+import UserInfo from '../common/UserInfo';
 import '../../styles/components/layout/Header.css';
 
 const Header = ({ session }) => {
@@ -13,11 +14,7 @@ const Header = ({ session }) => {
         <div className="logo-text">EDUBRIDGE</div>
       </div>
       <div className="right-content">
-        {userName && (
-          <div className="user-info">
-            Welcome, {userName}!
-          </div>
-        )}
+        <UserInfo userName={userName} />
       </div>
     </header>
   );

@@ -18,7 +18,7 @@ const DashboardStats = ({ stats, onCardHover, onNavigate }) => {
           <div className="action-buttons">
             <button 
               className="btn btn-primary"
-              onClick={() => onNavigate('Addbook')}
+              onClick={() => onNavigate('Add New Book')}
             >
               Add New Book
             </button>

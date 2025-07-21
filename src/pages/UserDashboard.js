@@ -155,9 +155,8 @@ const UserDashboard = ({ session }) => {
       'Home': '/home',
       'User Dashboard': '/userdashboard',
       'Textbook Market': '/textbookmarket',
-      'Addbook': '/addbook',
-      'Cart': '/cart',
-      'Sale': '/sale'
+      'Add New Book': '/sale',
+      'Cart': '/cart'
     };
     
     const route = routes[page];

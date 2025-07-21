@@ -6,8 +6,8 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import UserDashboard from './pages/UserDashboard';
 import TextbookMarket from './pages/TextbookMarket';
-import Addbook from './pages/Addbook';
 import Cart from './pages/Cart';
+import Sale from './pages/Sale';
 
 import './App.css';
 
@@ -54,8 +54,8 @@ function App() {
           <Route path="/home" element={session ? <Home session={session} /> : <Navigate to="/login" />} />
           <Route path="/userdashboard" element={session ? <UserDashboard session={session} /> : <Navigate to="/login" />} />
           <Route path="/textbookmarket" element={session ? <TextbookMarket session={session} /> : <Navigate to="/login" />} />
-          <Route path="/addbook" element={session ? <Addbook session={session} /> : <Navigate to="/login" />} />
           <Route path="/cart" element={session ? <Cart session={session} /> : <Navigate to="/login" />} />
+          <Route path="/sale" element={session ? <Sale session={session} /> : <Navigate to="/login" />} />
         </Routes>
       </div>
     </Router>

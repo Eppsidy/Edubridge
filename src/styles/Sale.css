@@ -1,0 +1,421 @@
+/* Sale.css */
+.sale-content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.sale-main-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.sale-form {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.sale-form-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 24px;
+}
+
+.sale-form-group {
+  margin-bottom: 20px;
+}
+
+.sale-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.sale-form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 8px;
+}
+
+.sale-form-input,
+.sale-form-select,
+.sale-form-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.sale-form-input:focus,
+.sale-form-select:focus,
+.sale-form-textarea:focus {
+  outline: none;
+  border-color: #2dd4bf;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
+}
+
+.sale-form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.sale-price-toggle {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.sale-toggle-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sale-toggle-option input[type="radio"] {
+  accent-color: #2dd4bf;
+}
+
+.sale-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.sale-btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.sale-btn-primary {
+  background: #2dd4bf;
+  color: white;
+}
+
+.sale-btn-primary:hover {
+  background: #14b8a6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 212, 191, 0.2);
+}
+
+.sale-btn-secondary {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.sale-btn-secondary:hover {
+  background: #e5e7eb;
+  transform: translateY(-2px);
+}
+
+.my-listings {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.listings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.listings-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.listings-count {
+  background: #2dd4bf;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.book-card {
+  border: 2px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+}
+
+.book-status {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.status-available {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.status-sold {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+
+.book-header {
+  margin-bottom: 16px;
+}
+
+.book-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.book-author {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.book-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.btn-edit:hover {
+  background: #e5e7eb;
+}
+
+.btn-delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.btn-delete:hover {
+  background: #fecaca;
+}
+
+.book-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.detail-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 0;
+  color: #6b7280;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.error-message {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.success-message {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.modal[style*="display: flex"] {
+  opacity: 1;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  width: 90%;
+  max-width: 400px;
+  transform: translateY(20px);
+  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-cancel {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.btn-confirm {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: #dc2626;
+  color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .sale-main-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sale-content-container {
+    padding: 16px;
+  }
+
+  .sale-form,
+  .my-listings {
+    padding: 24px;
+  }
+
+  .sale-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .listings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .sale-form-actions {
+    flex-direction: column;
+  }
+
+  .sale-btn {
+    width: 100%;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+  }
+}
