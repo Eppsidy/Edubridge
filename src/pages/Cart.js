@@ -1,198 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Plus, Minus, Trash2, BookOpen, DollarSign } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
+import Header from '../components/layout/Header';
+import Navigation from '../components/layout/Navigation';
+import CartItem from '../components/ui/CartItem';
+import OrderSummary from '../components/ui/OrderSummary';
+import EmptyCart from '../components/ui/EmptyCart';
+import Footer from '../components/layout/Footer';
 import '../styles/Cart.css';
 
-const Header = ({ session }) => {
-  const user = session?.user;
-  const userEmail = user?.email;
-  const userName = user?.user_metadata?.full_name || userEmail?.split('@')[0];
-
-  return (
-    <header className="header">
-      <div className="left-content">
-        <div className="logo-icon">EB</div>
-        <div className="logo-text">EDUBRIDGE</div>
-      </div>
-      <div className="right-content">
-        {userName && (
-          <div className="user-info">
-            Welcome, {userName}!
-          </div>
-        )}
-      </div>
-    </header>
-  );
-};
-
-const Navigation = ({ activeTab }) => {
-  return (
-    <nav className="nav-tabs">
-      <Link to="/home">Home</Link>
-      <Link to="/userdashboard">Dashboard</Link>
-      <Link to="/textbookmarket">Textbook Market</Link>
-      <Link to="/cart" className="active">Cart</Link>
-      <Link to="/sale">Sale</Link>
-    </nav>
-  );
-};
-
-const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
-  const { book, quantity } = item;
-  
-  // Get the correct price from either selling_price or price
-  const bookPrice = book.selling_price || book.price || 0;
-  
-  return (
-    <div className="cart-item">
-      <div className="item-image">
-        <div className="book-placeholder">
-          <BookOpen size={40} color="#9ca3af" />
-        </div>
-      </div>
-      <div className="item-details">
-        <div className="item-title">{book.title}</div>
-        <div className="item-author">by {book.author}</div>
-        <div className="item-seller">
-          Sold by: {book.seller} ({book.sellerCourse})
-        </div>
-        <div className="item-actions">
-          <div className="quantity-control">
-            <button 
-              className="quantity-btn" 
-              onClick={() => onUpdateQuantity(item.id, -1)}
-              disabled={quantity <= 1}
-            >
-              <Minus size={16} />
-            </button>
-            <input 
-              type="text" 
-              className="quantity-input" 
-              value={quantity} 
-              readOnly 
-            />
-            <button 
-              className="quantity-btn" 
-              onClick={() => onUpdateQuantity(item.id, 1)}
-              disabled={true}
-            >
-              <Plus size={16} />
-            </button>
-          </div>
-          <div className="item-price">
-            R{bookPrice.toFixed(2)}
-          </div>
-          <button 
-            className="remove-btn" 
-            onClick={() => onRemove(item.id)}
-            title="Remove from cart"
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const OrderSummary = ({ cartItems, onCheckout }) => {
-  const subtotal = cartItems.reduce((sum, item) => {
-    const itemPrice = item.book.selling_price || item.book.price || 0;
-    return sum + (itemPrice * item.quantity);
-  }, 0);
-  
-  const studentDiscount = subtotal * 0.1; // 10% student discount
-  const total = subtotal - studentDiscount;
-  
-  const [promoCode, setPromoCode] = useState('');
-  const [promoApplied, setPromoApplied] = useState(false);
-  
-  const handlePromoCode = () => {
-    if (promoCode.trim().toLowerCase() === 'student20') {
-      setPromoApplied(true);
-      alert('Promo code applied! Additional 20% off');
-    } else if (promoCode.trim()) {
-      alert('Invalid promo code');
-    }
-  };
-
-  const finalTotal = promoApplied ? total * 0.8 : total;
-
-  return (
-    <div className="summary-section">
-      <h2 className="summary-title">Order Summary</h2>
-      
-      <div className="summary-line">
-        <span className="summary-label">Subtotal ({cartItems.length} items)</span>
-        <span className="summary-value">R{subtotal.toFixed(2)}</span>
-      </div>
-      
-      <div className="summary-line">
-        <span className="summary-label">Student Discount (10%)</span>
-        <span className="summary-value" style={{ color: '#10b981' }}>
-          -R{studentDiscount.toFixed(2)}
-        </span>
-      </div>
-      
-      {promoApplied && (
-        <div className="summary-line">
-          <span className="summary-label">Promo Code (20%)</span>
-          <span className="summary-value" style={{ color: '#10b981' }}>
-            -R{(total * 0.2).toFixed(2)}
-          </span>
-        </div>
-      )}
-      
-      <div className="promo-section">
-        <label htmlFor="promoCode" style={{ fontWeight: 600, color: '#374151' }}>
-          Promo Code
-        </label>
-        <div className="promo-input">
-          <input
-            type="text"
-            className="promo-field"
-            id="promoCode"
-            placeholder="Enter code"
-            value={promoCode}
-            onChange={(e) => setPromoCode(e.target.value)}
-          />
-          <button className="promo-btn" onClick={handlePromoCode}>
-            Apply
-          </button>
-        </div>
-      </div>
-
-      <div className="summary-line total">
-        <span className="summary-label">Total</span>
-        <span className="summary-value total">R{finalTotal.toFixed(2)}</span>
-      </div>
-
-      <button 
-        className="checkout-btn"
-        onClick={() => onCheckout(finalTotal)}
-        disabled={cartItems.length === 0}
-      >
-        Checkout
-      </button>
-    </div>
-  );
-};
-
-const EmptyCart = () => (
-  <div className="cart-empty">
-    <div className="cart-empty-icon">
-      <ShoppingCart size={80} color="#9ca3af" />
-    </div>
-    <div className="cart-empty-title">Your cart is empty</div>
-    <div className="cart-empty-text">
-      Start adding some textbooks to get the best deals!
-    </div>
-    <Link to="/textbookmarket" className="checkout-btn">
-      Browse Textbooks
-    </Link>
-  </div>
-);
+// Component code has been moved to separate files
 
 const ShoppingCartPage = ({ session }) => {
   const [cartItems, setCartItems] = useState([]);
@@ -430,27 +247,15 @@ const ShoppingCartPage = ({ session }) => {
       <Navigation activeTab="cart" />
       
       <main className="main-content">
-        <div className="content-container" style={{ 
-          display: 'flex', 
-          gap: '2rem', 
-          maxWidth: '1200px', 
-          margin: '0 auto',
-          padding: '2rem'
-        }}>
-          <div className="cart-section" style={{ flex: '2' }}>
+        <div className="content-container">
+          <div className="cart-section">
             <div className="page-header">
               <h1 className="page-title">Shopping Cart</h1>
               <div className="cart-count">{cartItems.length} items</div>
             </div>
 
             {error && (
-              <div className="error-message" style={{ 
-                color: '#ef4444', 
-                background: '#fef2f2', 
-                padding: '1rem', 
-                borderRadius: '0.5rem',
-                marginBottom: '1rem'
-              }}>
+              <div className="error-message">
                 {error}
               </div>
             )}
@@ -480,7 +285,7 @@ const ShoppingCartPage = ({ session }) => {
             )}
           </div>
 
-          <div style={{ flex: '1' }}>
+          <div className="summary-container">
             <OrderSummary 
               cartItems={cartItems} 
               onCheckout={handleCheckout}
@@ -489,9 +294,7 @@ const ShoppingCartPage = ({ session }) => {
         </div>
       </main>
 
-      <div className="footer">
-        <p>&copy; 2025 EduBridge | Connecting Students Through Knowledge</p>
-      </div>
+      <Footer />
     </div>
   );
 };

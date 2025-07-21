@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import '../styles/UserDashboard.css';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import DashboardSidebar from '../components/sections/dashboard/DashboardSidebar';
 import DashboardStats from '../components/sections/dashboard/DashboardStats';
