@@ -15,26 +15,34 @@ function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Get initial session
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setLoading(false);
-    };
+ useEffect(() => {
+  const getSession = async () => {
+    try {
+      const { data, error } = await supabase.auth.getSession();
 
-    getSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setLoading(false);
+      if (error) {
+        console.error("Session fetch error:", error.message);
+        setSession(null);
+      } else {
+        setSession(data.session);
       }
-    );
+    } catch (err) {
+      console.error("Unexpected error getting session:", err.message);
+      setSession(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return () => subscription.unsubscribe();
-  }, []);
+  getSession();
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    setSession(session);
+    setLoading(false);
+  });
+
+  return () => subscription.unsubscribe();
+}, []);
 
   if (loading) {
     return (

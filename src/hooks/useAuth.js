@@ -6,22 +6,14 @@ export const useAuth = () => {
 
   const handleLogout = async () => {
     try {
-      // First check if there's an active session
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        // If no session, just redirect to login
-        navigate('/login');
-        return;
-      }
-
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
-      navigate('/login');
+      if (error) {
+        console.error('Logout error:', error.message);
+      }
     } catch (error) {
-      console.error('Logout error:', error.message);
-      // Still redirect to login even if there's an error
+      console.error('Unexpected logout error:', error.message);
+    } finally {
+      // Always redirect to login, even if there's an error
       navigate('/login');
     }
   };
