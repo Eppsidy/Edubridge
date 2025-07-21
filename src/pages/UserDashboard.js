@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import '../styles/UserDashboard.css';
+import DashboardLayout from '../components/layout/DashboardLayout';
+import DashboardSidebar from '../components/sections/dashboard/DashboardSidebar';
+import DashboardStats from '../components/sections/dashboard/DashboardStats';
+import DashboardContent from '../components/sections/dashboard/DashboardContent';
 
 const UserDashboard = ({ session }) => {
   const [activeSection, setActiveSection] = useState('profile');
@@ -240,87 +243,12 @@ const UserDashboard = ({ session }) => {
   };
 
   return (
-    <div className="user-dashboard">
-      <header className="header">
-        <div className="left-content">
-          <div className="logo-icon">EB</div>
-          <div className="logo-text">EDUBRIDGE</div>
-        </div>
-        <div className="right-content">
-          {userName && (
-            <div className="user-info">
-              Welcome, {userName}!
-            </div>
-          )}
-        </div>
-      </header>
-
-      <nav className="nav-tabs">
-        <Link to="/home">Home</Link>
-        <Link to="/userdashboard" className="active">Dashboard</Link>
-        <Link to="/textbookmarket">Textbook Market</Link>
-        <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('Cart'); }}>
-          Cart
-        </a>
-        <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('Sale'); }}>
-          Sale
-        </a>
-      </nav>
-
+    <DashboardLayout userName={userName} onLogout={handleLogout}>
       <div className="main-container">
-        <aside className="sidebar">
-          <h3>Dashboard Menu</h3>
-          <ul>
-            <li>
-              <a 
-                href="#profile" 
-                className={activeSection === 'profile' ? 'active' : ''}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSidebarClick('profile');
-                }}
-              >
-                Profile
-              </a>
-            </li>
-            <li>
-              <a 
-                href="#textbooks"
-                className={activeSection === 'textbooks' ? 'active' : ''}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSidebarClick('textbooks');
-                }}
-              >
-                My Textbooks
-              </a>
-            </li>
-            <li>
-              <a 
-                href="#purchases"
-                className={activeSection === 'purchases' ? 'active' : ''}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSidebarClick('purchases');
-                }}
-              >
-                My Purchases
-              </a>
-            </li>
-            <li>
-              <a 
-                href="#settings"
-                className={activeSection === 'settings' ? 'active' : ''}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSidebarClick('settings');
-                }}
-              >
-                Settings
-              </a>
-            </li>
-          </ul>
-        </aside>
+        <DashboardSidebar 
+          activeSection={activeSection} 
+          onSectionChange={handleSidebarClick} 
+        />
 
         <main className="main-content">
           <div className="welcome-section">
@@ -333,104 +261,34 @@ const UserDashboard = ({ session }) => {
             </div>
           </div>
 
-          {activeSection === 'profile' && (
-            <div className="dashboard-grid">
-              <div 
-                className="dashboard-card"
-                onMouseEnter={(e) => handleCardHover(e, true)}
-                onMouseLeave={(e) => handleCardHover(e, false)}
-              >
-                <div className="card-header">         
-                  <h3>My Textbooks</h3>
-                </div>
-                <div className="card-content">
-                  <p>You have <strong>{userStats.textbooksListed} textbooks</strong> listed for sale</p>
-                  <p>You've sold <strong>{userStats.booksSold} books</strong> earning <strong>R{userStats.totalEarnings.toFixed(2)}</strong></p>
-                  <div className="action-buttons">
-                    <button 
-                      className="btn btn-primary"
-                      onClick={() => navigateTo('Addbook')}
-                    >
-                      Add New Book
-                    </button>
-                    <button 
-                      className="btn btn-secondary"
-                      onClick={() => handleSidebarClick('textbooks')}
-                    >
-                      View My Books
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div 
-                className="dashboard-card"
-                onMouseEnter={(e) => handleCardHover(e, true)}
-                onMouseLeave={(e) => handleCardHover(e, false)}
-              >
-                <div className="card-header"> 
-                  <h3>Recent Purchases</h3>
-                </div>
-                <div className="card-content">
-                  <p>{userStats.textbooksPurchased} textbooks purchased</p>
-                  <p>Total spent: <strong>R{userStats.totalSpent.toFixed(2)}</strong></p>
-                  <div className="action-buttons">
-                    <button 
-                      className="btn btn-primary"
-                      onClick={() => navigateTo('Textbook Market')}
-                    >
-                      Browse Market
-                    </button>
-                    <button 
-                      className="btn btn-secondary"
-                      onClick={() => handleSidebarClick('purchases')}
-                    >
-                      View Purchases
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div 
-                className="dashboard-card"
-                onMouseEnter={(e) => handleCardHover(e, true)}
-                onMouseLeave={(e) => handleCardHover(e, false)}
-              >
-                <div className="card-header">
-                  <h3>Your Statistics</h3>
-                </div>
-                <div className="card-content">
-                  <div className="stats-grid">
-                    <div className="stat-item">
-                      <div className="stat-number">{userStats.booksSold}</div>
-                      <div className="stat-label">Books Sold</div>
-                    </div>
-                    <div className="stat-item">
-                      <div className="stat-number">{userStats.booksBought}</div>
-                      <div className="stat-label">Books Bought</div>
-                    </div>
-                    <div className="stat-item">
-                      <div className="stat-number">R{userStats.totalEarnings.toFixed(0)}</div>
-                      <div className="stat-label">Total Earnings</div>
-                    </div>
-                    <div className="stat-item">
-                      <div className="stat-number">R{userStats.totalSpent.toFixed(0)}</div>
-                      <div className="stat-label">Total Spent</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {activeSection === 'profile' ? (
+            <DashboardStats 
+              stats={userStats}
+              onCardHover={handleCardHover}
+              onNavigate={(target) => {
+                if (target === 'textbooks' || target === 'purchases') {
+                  handleSidebarClick(target);
+                } else {
+                  navigateTo(target);
+                }
+              }}
+            />
+          ) : (
+            <DashboardContent
+              activeSection={activeSection}
+              userProfile={{
+                name: userName,
+                email: userEmail,
+                createdAt: user?.created_at
+              }}
+              userBooks={userBooks}
+              userPurchases={userPurchases}
+              loading={loading}
+            />
           )}
-
-          {activeSection !== 'profile' && renderContent()}
         </main>
       </div>
-
-      <div className="footer">
-        <p>&copy; 2025 EduBridge | Connecting Students Through Knowledge</p>
-      </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
