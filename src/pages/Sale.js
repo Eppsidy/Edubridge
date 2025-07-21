@@ -73,7 +73,6 @@ const EduBridgeSale = ({ session }) => {
           ...book,
           subject: book.categories?.name || 'Other',
           listingType: book.selling_price === 0 ? 'donate' : 'sell',
-          price: book.selling_price,
           status: book.availability_status.toLowerCase()
         })));
       } catch (err) {
@@ -202,8 +201,6 @@ const EduBridgeSale = ({ session }) => {
         publication_year: formData.publication_year ? parseInt(formData.publication_year) : null,
         category_id: formData.category_id ? parseInt(formData.category_id) : null,
         seller_id: userProfile.id,
-        price: formData.listingType === 'sell' ? parseFloat(formData.selling_price) : 0,
-        original_price: formData.listingType === 'sell' ? parseFloat(formData.selling_price) : 0,
         selling_price: formData.listingType === 'sell' ? parseFloat(formData.selling_price) : 0,
         condition_rating: formData.condition_rating,
         description: formData.description.trim() || null,
