@@ -1,0 +1,65 @@
+.sale-content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.sale-main-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.error-message {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.success-message {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sale-main-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .sale-form,
+  .my-listings {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sale-content-container {
+    padding: 16px;
+  }
+  
+  .sale-form-actions {
+    flex-direction: column;
+  }
+}

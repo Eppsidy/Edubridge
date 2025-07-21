@@ -9,6 +9,7 @@ import ListingsGrid from '../components/sale/ListingsGrid';
 import DeleteModal from '../components/sale/DeleteModal';
 import '../styles/components/sale/index.css';
 import '../styles/components/sale/BookCard.css';
+import '../styles/components/sale/Layout.css';
 
 const EduBridgeSale = ({ session }) => {
   const navigate = useNavigate();

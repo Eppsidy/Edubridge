@@ -172,18 +172,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 1024px) {
-  .sale-main-content {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 768px) {
-  .sale-form,
-  .my-listings {
-    padding: 24px;
-  }
-
   .sale-form-row {
     grid-template-columns: 1fr;
   }
@@ -194,10 +183,6 @@
 }
 
 @media (max-width: 480px) {
-  .sale-form-actions {
-    flex-direction: column;
-  }
-
   .modal-content {
     width: 95%;
     padding: 20px;
