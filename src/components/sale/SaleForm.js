@@ -1,16 +1,70 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 
 const SaleForm = ({ 
   formData, 
+  setFormData, 
   handleInputChange, 
   handleSubmit, 
   categories, 
   loading, 
   navigate, 
-  editingIndex 
+  editingIndex, 
+  userProfile 
 }) => {
+  const [errors, setErrors] = useState({});
+
+  const validateForm = (data) => {
+    const errors = {};
+    
+    // Required fields for both selling and donating
+    const requiredFields = ['title', 'author', 'condition_rating', 'category_id'];
+    
+    requiredFields.forEach(field => {
+      if (!data[field] || data[field].trim() === '') {
+        errors[field] = `${field.replace('_', ' ').toUpperCase()} is required`;
+      }
+    });
+
+    // Price validation only if listing type is 'sell'
+    if (data.listingType === 'sell') {
+      if (!data.selling_price || isNaN(data.selling_price) || data.selling_price <= 0) {
+        errors.selling_price = 'Please enter a valid price greater than 0';
+      }
+    }
+
+    return errors;
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    
+    const validationErrors = validateForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    // Prepare book data
+    const bookData = {
+      title: formData.title.trim(),
+      author: formData.author.trim(),
+      isbn: formData.isbn.trim() || null,
+      edition: formData.edition.trim() || null,
+      publisher: formData.publisher.trim() || null,
+      publication_year: formData.publication_year ? parseInt(formData.publication_year) : null,
+      category_id: formData.category_id,
+      seller_id: userProfile.id,
+      selling_price: formData.listingType === 'donate' ? 0 : parseFloat(formData.selling_price),
+      condition_rating: formData.condition_rating,
+      description: formData.description.trim() || null,
+      availability_status: 'Available'
+    };
+
+    // ... rest of submit handler
+  };
+
   return (
     <div className="sale-form">
       <h2 className="sale-form-title">
@@ -29,6 +83,7 @@ const SaleForm = ({
             required
             disabled={loading}
           />
+          {errors.title && <div className="sale-form-error">{errors.title}</div>}
         </div>
 
         <div className="sale-form-group">
@@ -42,6 +97,7 @@ const SaleForm = ({
             required
             disabled={loading}
           />
+          {errors.author && <div className="sale-form-error">{errors.author}</div>}
         </div>
 
         <div className="sale-form-row">
@@ -158,6 +214,7 @@ const SaleForm = ({
               required
               disabled={loading}
             />
+            {errors.selling_price && <div className="sale-form-error">{errors.selling_price}</div>}
           </div>
         )}
 
@@ -202,7 +259,7 @@ const SaleForm = ({
             Cancel
           </Button>
           <Button
-            onClick={handleSubmit}
+            onClick={handleFormSubmit}
             variant="primary"
             disabled={loading}
           >

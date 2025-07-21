@@ -146,29 +146,31 @@ const EduBridgeSale = ({ session }) => {
     setSuccessMsg('');
     setLoading(true);
 
-    if (!formData.title.trim() || !formData.author.trim() || !formData.selling_price) {
-      setError('Please fill in all required fields');
-      setLoading(false);
-      return;
-    }
-
-    if (parseFloat(formData.selling_price) <= 0 && formData.listingType === 'sell') {
-      setError('Selling price must be greater than 0');
-      setLoading(false);
-      return;
-    }
-
     try {
+      // First check if user is authenticated
+      if (!user) {
+        throw new Error('Please login to list a book');
+      }
+
+      // Validate form data
+      if (!formData.title.trim() || !formData.author.trim()) {
+        throw new Error('Please fill in all required fields');
+      }
+
+      if (formData.listingType === 'sell' && (!formData.selling_price || parseFloat(formData.selling_price) <= 0)) {
+        throw new Error('Selling price must be greater than 0');
+      }
+
+      // Get or create user profile
       let userProfile;
-      
-      const { data: existingProfile, error: fetchError } = await supabase
+      const { data: existingProfile, error: profileError } = await supabase
         .from('users')
         .select('id')
         .eq('auth_id', user.id)
         .single();
 
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        throw fetchError;
+      if (profileError && profileError.code !== 'PGRST116') {
+        throw profileError;
       }
 
       if (existingProfile) {
@@ -188,8 +190,18 @@ const EduBridgeSale = ({ session }) => {
           .select('id')
           .single();
 
-        if (createError) throw createError;
+        if (createError) {
+          throw createError;
+        }
+        if (!newProfile) {
+          throw new Error('Failed to create user profile');
+        }
         userProfile = newProfile;
+      }
+
+      // Ensure we have a valid user profile before proceeding
+      if (!userProfile || !userProfile.id) {
+        throw new Error('User profile not found');
       }
 
       const bookData = {
