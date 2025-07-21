@@ -1,18 +1,28 @@
 import { supabase } from '../lib/supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
 export const useAuth = () => {
+  const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error logging out:', error.message);
-        alert('Error logging out. Please try again.');
-      } else {
-        console.log('Logged out successfully');
+      // First check if there's an active session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // If no session, just redirect to login
+        navigate('/login');
+        return;
       }
+
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
+      navigate('/login');
     } catch (error) {
-      console.error('Unexpected error during logout:', error);
-      alert('Unexpected error occurred. Please try again.');
+      console.error('Logout error:', error.message);
+      // Still redirect to login even if there's an error
+      navigate('/login');
     }
   };
 

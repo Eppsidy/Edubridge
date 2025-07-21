@@ -230,7 +230,7 @@ const ShoppingCartPage = ({ session }) => {
     return (
       <div className="textbook-market">
         <Header session={session} />
-        <Navigation activeTab="cart" />
+        <Navigation activeTab="Cart" />
         <main className="main-content">
           <div className="content-card">
             <p>Please log in to view your cart.</p>
@@ -244,7 +244,7 @@ const ShoppingCartPage = ({ session }) => {
   return (
     <div className="textbook-market">
       <Header session={session} />
-      <Navigation activeTab="cart" />
+      <Navigation activeTab="Cart" />
       
       <main className="main-content">
         <div className="content-container">

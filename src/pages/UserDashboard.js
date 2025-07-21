@@ -1,12 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../hooks/useAuth';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import DashboardSidebar from '../components/sections/dashboard/DashboardSidebar';
 import DashboardStats from '../components/sections/dashboard/DashboardStats';
 import DashboardContent from '../components/sections/dashboard/DashboardContent';
 
 const UserDashboard = ({ session }) => {
+  const { handleLogout } = useAuth();
+  const navigate = useNavigate();
+
+  // Check for session on component mount
+  useEffect(() => {
+    if (!session) {
+      navigate('/login');
+    }
+  }, [session, navigate]);
+
+  const onLogout = async () => {
+    try {
+      await handleLogout();
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
   const [activeSection, setActiveSection] = useState('profile');
   const [userStats, setUserStats] = useState({
     textbooksListed: 0,
@@ -19,7 +38,6 @@ const UserDashboard = ({ session }) => {
   const [userBooks, setUserBooks] = useState([]);
   const [userPurchases, setUserPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   // Get user info from session
   const user = session?.user;
@@ -135,21 +153,6 @@ const UserDashboard = ({ session }) => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error logging out:', error.message);
-        alert('Error logging out. Please try again.');
-      } else {
-        console.log('Logged out successfully');
-      }
-    } catch (error) {
-      console.error('Unexpected error during logout:', error);
-      alert('Unexpected error occurred. Please try again.');
-    }
-  };
-
   const navigateTo = (page) => {
     const routes = {
       'Home': '/home',
@@ -165,7 +168,7 @@ const UserDashboard = ({ session }) => {
     }
   };
 
-  const renderContent = () => {
+  {
     if (loading) {
       return <div className="loading">Loading your dashboard...</div>;
     }
@@ -241,7 +244,7 @@ const UserDashboard = ({ session }) => {
   };
 
   return (
-    <DashboardLayout userName={userName} onLogout={handleLogout}>
+    <DashboardLayout userName={userName} onLogout={onLogout}>
       <div className="main-container">
         <DashboardSidebar 
           activeSection={activeSection} 
@@ -254,7 +257,7 @@ const UserDashboard = ({ session }) => {
               <h2>Welcome back{userName ? `, ${userName}` : ''}!</h2>
               <p>Ready to continue your learning journey? Check out your latest activity below.</p>
             </div>
-            <div className="logout-link" onClick={handleLogout}>
+            <div className="logout-link" onClick={onLogout}>
               LOGOUT
             </div>
           </div>

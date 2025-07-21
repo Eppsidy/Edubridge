@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
 import Navigation from '../components/layout/Navigation';
 import SearchFilters from '../components/common/SearchFilters';
 import BookCard from '../components/ui/BookCard';
@@ -211,9 +212,8 @@ const TextbookMarket = ({ session }) => {
         <Plus size={24} />
       </button>
 
-      <div className="footer">
-        <p>&copy; 2025 EduBridge | Connecting Students Through Knowledge</p>
-      </div>
+      <Footer/>
+
     </div>
   );
 };
