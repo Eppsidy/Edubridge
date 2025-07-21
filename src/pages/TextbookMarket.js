@@ -1,165 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import { Search, Plus, ShoppingCart, User, Home, BookOpen, DollarSign } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import Header from '../components/layout/Header';
+import Navigation from '../components/layout/Navigation';
+import SearchFilters from '../components/common/SearchFilters';
+import BookCard from '../components/ui/BookCard';
+import QuickStats from '../components/sections/dashboard/QuickStats';
 import '../styles/TextbookMarket.css';
 
-// Define courses array
-const courses = [
-  'All Courses',
-  'Computer Science',
-  'Mathematics',
-  'Physics',
-  'Chemistry',
-  'Biology',
-  'Engineering',
-  'Business',
-  'Psychology',
-  'History',
-  'Literature',
-  'Economics',
-  'Other'
-];
-
-const Header = ({ session }) => {
+const getUserName = (session) => {
   const user = session?.user;
   const userEmail = user?.email;
-  const userName = user?.user_metadata?.full_name || userEmail?.split('@')[0];
-
-  return (
-    <header className="header">
-      <div className="left-content">
-        <div className="logo-icon">EB</div>
-        <div className="logo-text">EDUBRIDGE</div>
-      </div>
-      <div className="right-content">
-        {userName && (
-          <div className="user-info">
-            Welcome, {userName}!
-          </div>
-        )}
-      </div>
-    </header>
-  );
-};
-
-const Navigation = ({ activeTab, setActiveTab }) => {
-  const navigate = useNavigate();
-
-  const navigateTo = (page) => {
-    const routes = {
-      'home': '/home',
-      'dashboard': '/userdashboard',
-      'market': '/market',
-      'cart': '/cart',
-      'sale': '/sale'
-    };
-    
-    const route = routes[page];
-    if (route) {
-      navigate(route);
-    }
-  };
-
-  return (
-    <nav className="nav-tabs">
-      <Link to="/home">Home</Link>
-      <Link to="/userdashboard">Dashboard</Link>
-      <Link to="/textbookmarket" className="active">Textbook Market</Link>
-      <Link to="/cart">Cart</Link>
-      <a 
-        href="#" 
-        onClick={(e) => { e.preventDefault(); navigateTo('sale'); }} 
-        className={activeTab === 'sale' ? 'active' : ''}
-      >
-        <DollarSign size={16} />
-        Sale
-      </a>
-    </nav>
-  );
-};
-
-const SearchFilters = ({ searchTerm, setSearchTerm, selectedCourse, setSelectedCourse }) => (
-  <div className="search-filters">
-    <div className="search-bar">
-      <Search className="search-icon" size={20} />
-      <input
-        type="text"
-        className="search-input"
-        placeholder="Search by title, author, or ISBN..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-    </div>
-    <select 
-      className="filter-select"
-      value={selectedCourse}
-      onChange={(e) => setSelectedCourse(e.target.value)}
-    >
-      {courses.map(course => (
-        <option key={course} value={course}>{course}</option>
-      ))}
-    </select>
-  </div>
-);
-
-const BookCard = ({ book, onBuyNow }) => (
-  <div className="book-card">
-    <div className="book-image">
-      <div className="book-placeholder">
-        <BookOpen size={40} color="#9ca3af" />
-        <div className="book-title-small">{book.title}</div>
-      </div>
-    </div>
-    <div className="book-title">{book.title}</div>
-    <div className="book-author">by {book.author}</div>
-    <div className="book-details">
-      <div className="book-price">
-        {(book.selling_price || book.price) != null 
-          ? `R${(book.selling_price || book.price).toFixed(2)}` 
-          : 'Price not set'
-        }
-      </div>
-      <div className="book-condition">{book.condition_rating}</div>
-    </div>
-    <div className="book-seller">
-      Sold by: {book.seller} ({book.sellerCourse})
-    </div>
-    <div className="book-actions">
-      <button className="btn btn-primary" onClick={() => onBuyNow(book)}>
-        Buy Now
-      </button>
-    </div>
-  </div>
-);
-
-const QuickStats = ({ books }) => {
-  const totalBooks = books.length;
-  const avgPrice = totalBooks > 0 ? books.reduce((sum, book) => sum + book.price, 0) / totalBooks : 0;
-  const uniqueCourses = new Set(books.map(book => book.course)).size;
-  const activeSellers = new Set(books.map(book => book.seller)).size;
-
-  return (
-    <div className="quick-stats">
-      <div className="stat-card">
-        <div className="stat-number">{totalBooks}</div>
-        <div className="stat-label">Books Available</div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-number">R{avgPrice.toFixed(0)}</div>
-        <div className="stat-label">Average Price</div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-number">{uniqueCourses}</div>
-        <div className="stat-label">Courses</div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-number">{activeSellers}</div>
-        <div className="stat-label">Active Sellers</div>
-      </div>
-    </div>
-  );
+  return user?.user_metadata?.full_name || userEmail?.split('@')[0];
 };
 
 const TextbookMarket = ({ session }) => {
@@ -306,8 +159,8 @@ const TextbookMarket = ({ session }) => {
 
   return (
     <div className="textbook-market">
-      <Header session={session} />
-      <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Header user={session?.user} userName={getUserName(session)} />
+      <Navigation activeTab="Market" />
       
       <main className="main-content">
         <div className="content-card">
