@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import '../styles/Sale.css';
-
+import Header from '../components/layout/Header';
+import Navigation from '../components/layout/Navigation';
+import Footer from '../components/layout/Footer';
 import SaleForm from '../components/sale/SaleForm';
 import ListingsGrid from '../components/sale/ListingsGrid';
 import DeleteModal from '../components/sale/DeleteModal';
@@ -310,22 +310,8 @@ const EduBridgeSale = ({ session }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-     
-      <header className="header">
-        <div className="left-content">
-          <div className="logo-icon">EB</div>
-          <div className="logo-text">EDUBRIDGE</div>
-        </div>
-        <div className="right-content"></div>
-      </header>
-
-      <nav className="nav-tabs">
-        <Link to="/home">Home</Link>
-        <Link to="/userdashboard">Dashboard</Link>
-        <Link to="/textbookmarket">Textbook Market</Link>
-        <Link to="/cart">Cart</Link>
-        <Link to="/sale" className="active">Sale</Link>
-      </nav>
+      <Header session={session} />
+      <Navigation activeTab="Sale" />
 
       <div className="sale-content-container">
         <div className="page-header">
@@ -355,9 +341,7 @@ const EduBridgeSale = ({ session }) => {
         </div>
       </div>
 
-      <div className="footer">
-        <p>&copy; 2025 EduBridge | Connecting Students Through Knowledge</p>
-      </div>
+      <Footer />
 
       <DeleteModal
         show={showDeleteModal}
