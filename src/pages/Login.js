@@ -10,11 +10,32 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (event === 'SIGNED_IN' && session) {
-          // Redirect to homepage after successful login
+        if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user) {
+          const userId = session.user.id;
+
+          try {
+            // Check if user profile exists in 'users' table
+            const { data: existingUser, error } = await supabase
+              .from('users')
+              .select('id')
+              .eq('id', userId)
+              .single();
+
+            if (!existingUser && !error) {
+              // Insert new user profile
+              await supabase.from('users').insert({
+                id: userId,
+                email: session.user.email,
+                // Add other fields if needed, e.g., full_name: ''
+              });
+            }
+          } catch (err) {
+            console.error('Error checking/inserting user profile:', err.message);
+          }
+
+          // Redirect after successful login/signup/profile creation
           navigate('/');
         }
       }
@@ -31,9 +52,7 @@ function Login() {
           <h1 className="logo-text">EDUBRIDGE</h1>
           <p className="logo-subtitle">Your Student-Powered Learning Hub</p>
         </div>
-        
-        <h2 className="auth-title"></h2>
-        
+
         <Auth
           supabaseClient={supabase}
           appearance={{ 
