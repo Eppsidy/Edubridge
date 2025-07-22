@@ -9,40 +9,40 @@ import '../styles/Login.css';
 function Login() {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user) {
-          const userId = session.user.id;
+ useEffect(() => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    async (event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user) {
+        const userId = session.user.id;
 
-          try {
-            // Check if user profile exists in 'users' table
-            const { data: existingUser, error } = await supabase
-              .from('users')
-              .select('id')
-              .eq('id', userId)
-              .single();
+        try {
+          // Check if user profile exists in 'profiles' table
+          const { data: existingProfile, error } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('user_id', userId)
+            .single();
 
-            if (!existingUser && !error) {
-              // Insert new user profile
-              await supabase.from('users').insert({
-                id: userId,
-                email: session.user.email,
-                // Add other fields if needed, e.g., full_name: ''
-              });
-            }
-          } catch (err) {
-            console.error('Error checking/inserting user profile:', err.message);
+          if (!existingProfile && !error) {
+            // Insert new user profile
+            await supabase.from('profiles').insert({
+              user_id: userId,
+              email: session.user.email,
+              full_name: session.user.user_metadata?.full_name || ''
+            });
           }
-
-          // Redirect after successful login/signup/profile creation
-          navigate('/');
+        } catch (err) {
+          console.error('Error checking/inserting user profile:', err.message);
         }
-      }
-    );
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+        // Redirect after successful login/signup/profile creation
+        navigate('/');
+      }
+    }
+  );
+
+  return () => subscription.unsubscribe();
+}, [navigate]);
 
   return (
     <div className="auth-container">
