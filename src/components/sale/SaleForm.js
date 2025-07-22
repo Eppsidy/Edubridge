@@ -41,6 +41,12 @@ const SaleForm = ({
     e.preventDefault();
     
     const validationErrors = validateForm(formData);
+    
+    // Check if userProfile exists
+    if (!userProfile) {
+      validationErrors.general = "User profile not found. Please log in again.";
+    }
+    
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -55,7 +61,7 @@ const SaleForm = ({
       publisher: formData.publisher.trim() || null,
       publication_year: formData.publication_year ? parseInt(formData.publication_year) : null,
       category_id: formData.category_id,
-      seller_id: userProfile.id,
+      seller_id: userProfile?.id || null,
       selling_price: formData.listingType === 'donate' ? 0 : parseFloat(formData.selling_price),
       condition_rating: formData.condition_rating,
       description: formData.description.trim() || null,
@@ -70,6 +76,8 @@ const SaleForm = ({
       <h2 className="sale-form-title">
         {editingIndex >= 0 ? 'Edit Textbook' : 'Add New Textbook'}
       </h2>
+      
+      {errors.general && <div className="sale-form-error general-error">{errors.general}</div>}
       
       <div>
         <div className="sale-form-group">

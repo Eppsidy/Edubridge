@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
+import { profileService } from '../services/profileService';
+import { bookService } from '../services/bookService';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import DashboardSidebar from '../components/sections/dashboard/DashboardSidebar';
 import DashboardStats from '../components/sections/dashboard/DashboardStats';
@@ -38,6 +40,7 @@ const UserDashboard = ({ session }) => {
   const [userBooks, setUserBooks] = useState([]);
   const [userPurchases, setUserPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Get user info from session
   const user = session?.user;
@@ -52,48 +55,21 @@ const UserDashboard = ({ session }) => {
       try {
         setLoading(true);
         
-        // Get user profile
-        const { data: userProfile, error: userError } = await supabase
-          .from('users')
-          .select('id')
-          .eq('auth_id', user.id)
-          .single();
-
-        if (userError && userError.code !== 'PGRST116') {
-          throw userError;
-        }
-
+        // Get or create user profile using profileService
+        const userProfile = await profileService.getOrCreateProfile(user);
+        
         if (!userProfile) {
-          // Create user profile if it doesn't exist
-          const { data: newProfile, error: createError } = await supabase
-            .from('users')
-            .insert([
-              {
-                auth_id: user.id,
-                email: user.email,
-                first_name: userName || 'User',
-                last_name: '',
-                course_of_study: 'Not specified'
-              }
-            ])
-            .select('id')
-            .single();
-
-          if (createError) throw createError;
-          userProfile = newProfile;
+          throw new Error('Failed to get or create user profile');
         }
+        
+        const userProfileId = userProfile.id;
 
-        // Fetch user's listed books
-        const { data: books, error: booksError } = await supabase
-          .from('books')
-          .select(`
-            *,
-            categories:category_id (name)
-          `)
-          .eq('seller_id', userProfile.id)
-          .order('created_at', { ascending: false });
-
-        if (booksError) throw booksError;
+        // Fetch user's listed books using bookService
+        const { books } = await bookService.getBooksBySeller(userProfileId, { 
+          page: 1, 
+          pageSize: 100 // Get a reasonable number of books
+        });
+        
         setUserBooks(books || []);
 
         // Fetch user's purchases (assuming you have a purchases/orders table)
@@ -107,7 +83,7 @@ const UserDashboard = ({ session }) => {
               selling_price
             )
           `)
-          .eq('buyer_id', userProfile.id)
+          .eq('buyer_id', userProfileId)
           .order('created_at', { ascending: false });
 
         if (purchasesError && purchasesError.code !== '42P01') {
@@ -117,10 +93,15 @@ const UserDashboard = ({ session }) => {
         setUserPurchases(purchases || []);
 
         // Calculate statistics
-        const availableBooks = books?.filter(book => book.availability_status === 'Available') || [];
-        const soldBooks = books?.filter(book => book.availability_status === 'Sold') || [];
-        const totalEarnings = soldBooks.reduce((sum, book) => sum + (book.selling_price || 0), 0);
-        const totalSpent = purchases?.reduce((sum, purchase) => sum + (purchase.amount || 0), 0) || 0;
+        // Note: bookService transforms availability_status to status (lowercase)
+        const availableBooks = books?.filter(book => 
+          book.status === 'available' || book.availability_status === 'Available') || [];
+        const soldBooks = books?.filter(book => 
+          book.status === 'sold' || book.availability_status === 'Sold') || [];
+        const totalEarnings = soldBooks.reduce((sum, book) => 
+          sum + (book.price || book.selling_price || 0), 0);
+        const totalSpent = purchases?.reduce((sum, purchase) => 
+          sum + (purchase.amount || 0), 0) || 0;
 
         setUserStats({
           textbooksListed: availableBooks.length,
@@ -133,13 +114,15 @@ const UserDashboard = ({ session }) => {
 
       } catch (error) {
         console.error('Error fetching user data:', error);
+        // Set an error state that can be displayed to the user
+        setError('Failed to load your dashboard data. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserData();
-  }, [user, userName]);
+  }, [user]);
 
   const handleSidebarClick = (section) => {
     setActiveSection(section);
@@ -198,10 +181,10 @@ const UserDashboard = ({ session }) => {
                   <div key={book.id} className="book-item">
                     <h4>{book.title}</h4>
                     <p>by {book.author}</p>
-                    <p><strong>Price:</strong> R{book.selling_price?.toFixed(2)}</p>
+                    <p><strong>Price:</strong> R{(book.price || book.selling_price || 0).toFixed(2)}</p>
                     <p><strong>Condition:</strong> {book.condition_rating}</p>
-                    <p><strong>Status:</strong> {book.availability_status}</p>
-                    <p><strong>Category:</strong> {book.categories?.name || 'Uncategorized'}</p>
+                    <p><strong>Status:</strong> {book.status || book.availability_status}</p>
+                    <p><strong>Category:</strong> {book.course || book.categories?.name || 'Uncategorized'}</p>
                   </div>
                 ))}
               </div>
@@ -261,6 +244,31 @@ const UserDashboard = ({ session }) => {
               LOGOUT
             </div>
           </div>
+          
+          {error && (
+            <div className="error-message" style={{ 
+              color: 'red', 
+              margin: '10px 0', 
+              padding: '10px', 
+              backgroundColor: '#ffeeee', 
+              borderRadius: '4px', 
+              textAlign: 'center' 
+            }}>
+              {error}
+              <button 
+                onClick={() => setError(null)} 
+                style={{ 
+                  marginLeft: '10px', 
+                  background: 'none', 
+                  border: 'none', 
+                  cursor: 'pointer', 
+                  fontWeight: 'bold' 
+                }}
+              >
+                ✕
+              </button>
+            </div>
+          )}
 
           {activeSection === 'profile' ? (
             <DashboardStats 

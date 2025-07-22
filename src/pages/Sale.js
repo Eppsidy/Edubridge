@@ -48,9 +48,9 @@ const EduBridgeSale = ({ session }) => {
         
         // First get the user's profile ID
         const { data: userProfile, error: profileError } = await supabase
-          .from('users')
+          .from('profiles')
           .select('id')
-          .eq('auth_id', user.id)
+          .eq('user_id', user.id)
           .single();
 
         if (profileError) throw profileError;
@@ -164,9 +164,9 @@ const EduBridgeSale = ({ session }) => {
       // Get or create user profile
       let userProfile;
       const { data: existingProfile, error: profileError } = await supabase
-        .from('users')
+        .from('profiles')
         .select('id')
-        .eq('auth_id', user.id)
+        .eq('user_id', user.id)
         .single();
 
       if (profileError && profileError.code !== 'PGRST116') {
@@ -177,13 +177,12 @@ const EduBridgeSale = ({ session }) => {
         userProfile = existingProfile;
       } else {
         const { data: newProfile, error: createError } = await supabase
-          .from('users')
+          .from('profiles')
           .insert([
             {
-              auth_id: user.id,
+              user_id: user.id,
               email: user.email,
-              first_name: userName || 'User',
-              last_name: '',
+              full_name: userName || 'User',
               course_of_study: 'Not specified'
             }
           ])

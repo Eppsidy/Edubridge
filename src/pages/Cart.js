@@ -32,9 +32,9 @@ const ShoppingCartPage = ({ session }) => {
         // First get the user's profile ID
         let userProfile;
         const { data: existingProfile, error: profileError } = await supabase
-          .from('users')
+          .from('profiles')
           .select('id')
-          .eq('auth_id', session.user.id)
+          .eq('user_id', session.user.id)
           .single();
 
         if (profileError && profileError.code !== 'PGRST116') {
@@ -46,12 +46,11 @@ const ShoppingCartPage = ({ session }) => {
         } else {
           // Create user profile if it doesn't exist
           const { data: newProfile, error: createError } = await supabase
-            .from('users')
+            .from('profiles')
             .insert([{
-              auth_id: session.user.id,
+              user_id: session.user.id,
               email: session.user.email,
-              first_name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
-              last_name: '',
+              full_name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
               course_of_study: 'Not specified'
             }])
             .select('id')
@@ -68,9 +67,8 @@ const ShoppingCartPage = ({ session }) => {
             *,
             books:book_id (
               *,
-              users:seller_id (
-                first_name,
-                last_name,
+              profiles:seller_id (
+                full_name,
                 course_of_study
               ),
               categories:category_id (
@@ -88,10 +86,10 @@ const ShoppingCartPage = ({ session }) => {
           quantity: item.quantity,
           book: {
             ...item.books,
-            seller: item.books?.users ? 
-              `${item.books.users.first_name} ${item.books.users.last_name}` : 
+            seller: item.books?.profiles ? 
+              item.books.profiles.full_name : 
               'Unknown Seller',
-            sellerCourse: item.books?.users?.course_of_study || 'Unknown Course',
+            sellerCourse: item.books?.profiles?.course_of_study || 'Unknown Course',
             course: item.books?.categories?.name || 'Other'
           }
         }));
@@ -170,9 +168,9 @@ const ShoppingCartPage = ({ session }) => {
     try {
       // Get user profile ID first
       const { data: userProfile, error: profileError } = await supabase
-        .from('users')
+        .from('profiles')
         .select('id')
-        .eq('auth_id', session.user.id)
+        .eq('user_id', session.user.id)
         .single();
 
       if (profileError) throw profileError;
