@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../hooks/useAuth';
 import Header from '../components/layout/Header';
 import Navigation from '../components/layout/Navigation';
 import Footer from '../components/layout/Footer';
@@ -11,8 +12,13 @@ import '../styles/components/sale/index.css';
 import '../styles/components/sale/BookCard.css';
 import '../styles/components/sale/Layout.css';
 
+/**
+ * Sale page component for listing books
+ * Protected feature that requires a non-anonymous user
+ */
 const EduBridgeSale = ({ session }) => {
   const navigate = useNavigate();
+  const { isAnonymousUser, checkProtectedAccess } = useAuth();
   const user = session?.user;
   const userEmail = user?.email;
   const userName = user?.user_metadata?.full_name || userEmail?.split('@')[0];
@@ -38,6 +44,12 @@ const EduBridgeSale = ({ session }) => {
     description: '',
     listingType: 'sell'
   });
+  
+  // Check if user is allowed to access this page (non-anonymous users only)
+  useEffect(() => {
+    // This will redirect anonymous users to login with context
+    checkProtectedAccess(session, 'Book Listing');
+  }, [session, checkProtectedAccess]);
 
   useEffect(() => {
     const fetchUserListings = async () => {
@@ -140,6 +152,10 @@ const EduBridgeSale = ({ session }) => {
     }));
   };
 
+  /**
+   * Handle form submission for listing a book
+   * Validates form data and creates a new book listing
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -147,9 +163,10 @@ const EduBridgeSale = ({ session }) => {
     setLoading(true);
 
     try {
-      // First check if user is authenticated
-      if (!user) {
-        throw new Error('Please login to list a book');
+      // Check if user can access this protected feature
+      if (!checkProtectedAccess(session, 'Book Listing')) {
+        setLoading(false);
+        return; // checkProtectedAccess handles the redirect
       }
 
       // Validate form data
