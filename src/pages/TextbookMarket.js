@@ -7,6 +7,7 @@ import Navigation from '../components/layout/Navigation';
 import SearchFilters from '../components/common/SearchFilters';
 import BookCard from '../components/ui/BookCard';
 import QuickStats from '../components/sections/dashboard/QuickStats';
+import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
 import { bookService } from '../services/bookService';
 import { cartService } from '../services/cartService';
@@ -34,6 +35,7 @@ const TextbookMarket = ({ session }) => {
   });
   
   const navigate = useNavigate();
+  const { isAnonymousUser, checkProtectedAccess } = useAuth();
 
   // Fetch books from service with pagination
   const fetchBooks = useCallback(async (page = 1) => {
@@ -83,12 +85,14 @@ const TextbookMarket = ({ session }) => {
     };
   }, [books, pagination.totalItems]);
 
-  // Add to cart handler with optimized profile fetching
+  /**
+   * Add to cart handler with authentication check
+   * Redirects anonymous users to login with context
+   */
   const handleBuyNow = useCallback(async (book) => {
-    if (!session) {
-      alert('Please log in to purchase books');
-      navigate('/login');
-      return;
+    // Check if user can access this protected feature
+    if (!checkProtectedAccess(session, 'Book Purchase')) {
+      return; // checkProtectedAccess handles the redirect
     }
 
     try {
@@ -112,16 +116,20 @@ const TextbookMarket = ({ session }) => {
       console.error('Error adding to cart:', error);
       alert('Error adding book to cart. Please try again.');
     }
-  }, [session, navigate]);
+  }, [session, navigate, checkProtectedAccess]);
 
+  /**
+   * Handle sell book action with authentication check
+   * Redirects anonymous users to login with context
+   */
   const handleSellBook = useCallback(() => {
-    if (!session) {
-      alert('Please log in to sell books');
-      navigate('/login');
-      return;
+    // Check if user can access this protected feature
+    if (!checkProtectedAccess(session, 'Book Listing')) {
+      return; // checkProtectedAccess handles the redirect
     }
+    
     navigate('/sale');
-  }, [session, navigate]);
+  }, [session, navigate, checkProtectedAccess]);
 
   return (
     <div className="textbook-market">
