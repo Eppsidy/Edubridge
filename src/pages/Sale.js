@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
+import { bookService } from '../services/bookService';
 import Header from '../components/layout/Header';
 import Navigation from '../components/layout/Navigation';
 import Footer from '../components/layout/Footer';
@@ -22,7 +23,11 @@ const EduBridgeSale = ({ session }) => {
   const { isAnonymousUser, checkProtectedAccess } = useAuth();
   const user = session?.user;
   const userEmail = user?.email;
-  const userName = user?.user_metadata?.full_name || userEmail?.split('@')[0];
+  const getUserName = (session) => {
+    const user = session?.user;
+    const userEmail = user?.email;
+    return user?.user_metadata?.full_name || userEmail?.split('@')[0];
+  };
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
@@ -46,6 +51,52 @@ const EduBridgeSale = ({ session }) => {
     listingType: 'sell'
   });
   
+  // Add state for user profile
+  const [userProfile, setUserProfile] = useState(null);
+
+  // Move fetchUserListings outside useEffect so it can be called from handleSubmit
+  const fetchUserListings = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      
+      // Get or create user profile using profileService
+      const profile = await profileService.getOrCreateProfile(user);
+      setUserProfile(profile);
+
+      if (!profile?.id) {
+        throw new Error('Failed to get user profile');
+      }
+
+      // Fetch books listed by this user using profile ID
+      const { data: userBooks, error: booksError } = await supabase
+        .from('books')
+        .select(`
+          *,
+          categories:category_id (
+            name
+          )
+        `)
+        .eq('seller_id', profile.id) // Use profile.id instead of user.id
+        .order('created_at', { ascending: false });
+
+      if (booksError) throw booksError;
+
+      setListings(userBooks.map(book => ({
+        ...book,
+        subject: book.categories?.name || 'Other',
+        listingType: book.selling_price === 0 ? 'donate' : 'sell',
+        status: book.availability_status.toLowerCase()
+      })));
+    } catch (err) {
+      console.error('Error fetching listings:', err);
+      setError('Failed to load your listings. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Check if user is allowed to access this page (non-anonymous users only)
   useEffect(() => {
     // This will redirect anonymous users to login with context
@@ -53,49 +104,6 @@ const EduBridgeSale = ({ session }) => {
   }, [session, checkProtectedAccess]);
 
   useEffect(() => {
-    const fetchUserListings = async () => {
-      if (!user) return;
-      
-      try {
-        setLoading(true);
-        
-        // First get the user's profile ID
-        const { data: userProfile, error: profileError } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('user_id', user.id)
-          .single();
-
-        if (profileError) throw profileError;
-
-        // Fetch books listed by this user
-        const { data: userBooks, error: booksError } = await supabase
-          .from('books')
-          .select(`
-            *,
-            categories:category_id (
-              name
-            )
-          `)
-          .eq('seller_id', userProfile.id)
-          .order('created_at', { ascending: false });
-
-        if (booksError) throw booksError;
-
-        setListings(userBooks.map(book => ({
-          ...book,
-          subject: book.categories?.name || 'Other',
-          listingType: book.selling_price === 0 ? 'donate' : 'sell',
-          status: book.availability_status.toLowerCase()
-        })));
-      } catch (err) {
-        console.error('Error fetching listings:', err);
-        setError('Failed to load your listings. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUserListings();
   }, [user]);
 
@@ -162,15 +170,20 @@ const EduBridgeSale = ({ session }) => {
     setError(null);
     setSuccessMsg('');
     setLoading(true);
+    
+    console.log('[DEBUG_LOG] Sale.js: handleSubmit called');
 
     try {
       // Check if user can access this protected feature
+      console.log('[DEBUG_LOG] Sale.js: Checking protected access');
       if (!checkProtectedAccess(session, 'Book Listing')) {
+        console.log('[DEBUG_LOG] Sale.js: Protected access check failed');
         setLoading(false);
         return; // checkProtectedAccess handles the redirect
       }
 
       // Validate form data
+      console.log('[DEBUG_LOG] Sale.js: Validating form data');
       if (!formData.title.trim() || !formData.author.trim()) {
         throw new Error('Please fill in all required fields');
       }
@@ -179,13 +192,22 @@ const EduBridgeSale = ({ session }) => {
         throw new Error('Selling price must be greater than 0');
       }
 
-      // Get or create user profile using profileService
-      const userProfile = await profileService.getOrCreateProfile(user);
+      // Check if user is defined
+      console.log('[DEBUG_LOG] Sale.js: Checking user session');
+      if (!user) {
+        console.log('[DEBUG_LOG] Sale.js: User session is null or undefined');
+        throw new Error('User session expired. Please log in again.');
+      }
       
+      // Check if userProfile exists (already fetched in useEffect)
       if (!userProfile || !userProfile.id) {
+        console.log('[DEBUG_LOG] Sale.js: User profile not found or has no ID');
         throw new Error('User profile not found. Please log in again.');
       }
+      
+      console.log('[DEBUG_LOG] Sale.js: Using user ID:', user.id, 'Profile ID:', userProfile.id);
 
+      console.log('[DEBUG_LOG] Sale.js: Creating book data with profile ID:', userProfile.id);
       const bookData = {
         title: formData.title.trim(),
         author: formData.author.trim(),
@@ -194,7 +216,7 @@ const EduBridgeSale = ({ session }) => {
         publisher: formData.publisher.trim() || null,
         publication_year: formData.publication_year ? parseInt(formData.publication_year) : null,
         category_id: formData.category_id ? parseInt(formData.category_id) : null,
-        seller_id: userProfile.id,
+        seller_id: userProfile.id, // Use userProfile.id (integer) instead of user.id (UUID)
         selling_price: formData.listingType === 'sell' ? parseFloat(formData.selling_price) : 0,
         condition_rating: formData.condition_rating,
         description: formData.description.trim() || null,
@@ -208,20 +230,33 @@ const EduBridgeSale = ({ session }) => {
           .eq('id', listings[editingIndex].id);
 
         if (updateError) throw updateError;
-        
-        const updatedListings = [...listings];
-        updatedListings[editingIndex] = { ...bookData, id: listings[editingIndex].id };
-        setListings(updatedListings);
+      
+        // Re-fetch all listings to get the updated data with proper structure
+        await fetchUserListings();
         setEditingIndex(-1);
       } else {
         const { data: newBook, error: insertError } = await supabase
           .from('books')
           .insert([bookData])
-          .select()
+          .select(`
+            *,
+            categories:category_id (
+              name
+            )
+          `)
           .single();
 
         if (insertError) throw insertError;
-        setListings([...listings, newBook]);
+      
+        // Transform the new book to match the expected structure
+        const transformedBook = {
+          ...newBook,
+          subject: newBook.categories?.name || 'Other',
+          listingType: newBook.selling_price === 0 ? 'donate' : 'sell',
+          status: newBook.availability_status.toLowerCase()
+        };
+      
+        setListings([transformedBook, ...listings]);
       }
 
       setSuccessMsg('Book listed successfully!');
@@ -246,6 +281,7 @@ const EduBridgeSale = ({ session }) => {
     }
   };
 
+  // Rest of your component code remains the same...
   const editListing = (index) => {
     const book = listings[index];
     setEditingIndex(index);
@@ -279,7 +315,7 @@ const EduBridgeSale = ({ session }) => {
       try {
         setLoading(true);
         const bookToDelete = listings[deleteIndex];
-        
+
         const { error: deleteError } = await supabase
           .from('books')
           .delete()
@@ -302,7 +338,7 @@ const EduBridgeSale = ({ session }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header session={session} />
+      <Header user={session?.user} userName={getUserName(session)} />
       <Navigation activeTab="Sale" />
 
       <div className="sale-content-container">
@@ -316,15 +352,15 @@ const EduBridgeSale = ({ session }) => {
 
         <div className="sale-main-content">
           <SaleForm
-            formData={formData}
-            handleInputChange={handleInputChange}
-            handleSubmit={handleSubmit}
-            categories={categories}
-            loading={loading}
-            navigate={navigate}
-            editingIndex={editingIndex}
+              formData={formData}
+              handleInputChange={handleInputChange}
+              handleSubmit={handleSubmit}
+              categories={categories}
+              loading={loading}
+              navigate={navigate}
+              editingIndex={editingIndex}
+              userProfile={userProfile}
           />
-
           <ListingsGrid
             listings={listings}
             onEdit={editListing}

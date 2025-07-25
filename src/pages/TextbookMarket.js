@@ -66,6 +66,14 @@ const TextbookMarket = ({ session }) => {
     fetchBooks(1);
     setCurrentPage(1);
   }, [fetchBooks]);
+  
+  // Check for book added flag when component mounts
+  useEffect(() => {
+    if (localStorage.getItem('edubridge_book_added') === 'true') {
+      // Refresh books if a book was recently added
+      fetchBooks(currentPage);
+    }
+  }, [fetchBooks, currentPage]);
 
   // Handle page change
   const handlePageChange = (newPage) => {

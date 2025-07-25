@@ -12,9 +12,12 @@ export const profileService = {
    */
   async getOrCreateProfile(user) {
     if (!user) {
+      console.error('[DEBUG_LOG] getOrCreateProfile called with no user');
       throw new Error('User is required');
     }
 
+    console.log('[DEBUG_LOG] getOrCreateProfile called for user ID:', user.id);
+    
     try {
       // First try to get the existing profile
       const { data: existingProfile, error: profileError } = await supabase
@@ -23,16 +26,26 @@ export const profileService = {
         .eq('user_id', user.id)
         .single();
 
-      // If profile exists, return it
-      if (existingProfile) {
+      // If profile exists and has an id, return it
+      if (existingProfile && existingProfile.id) {
+        console.log('[DEBUG_LOG] Found existing profile:', existingProfile.id);
         return existingProfile;
       }
 
-      // If error is not "not found", throw it
-      if (profileError && profileError.code !== 'PGRST116') {
-        throw profileError;
+      // Handle the case where profile doesn't exist (PGRST116 = not found)
+      // or any other error that isn't a "not found" error
+      if (profileError) {
+        console.log('[DEBUG_LOG] Profile error code:', profileError.code);
+        console.log('[DEBUG_LOG] Profile error message:', profileError.message);
+        
+        if (profileError.code !== 'PGRST116') {
+          console.error('[DEBUG_LOG] Error fetching profile:', profileError);
+          throw profileError;
+        }
       }
 
+      console.log('[DEBUG_LOG] Creating new profile for user:', user.id);
+      
       // Create new profile if it doesn't exist
       const { data: newProfile, error: createError } = await supabase
         .from('profiles')
@@ -46,12 +59,19 @@ export const profileService = {
         .single();
 
       if (createError) {
+        console.error('[DEBUG_LOG] Error creating profile:', createError);
         throw createError;
       }
 
+      if (!newProfile || !newProfile.id) {
+        console.error('[DEBUG_LOG] Created profile is invalid:', newProfile);
+        throw new Error('Failed to create a valid user profile');
+      }
+
+      console.log('[DEBUG_LOG] Successfully created new profile:', newProfile.id);
       return newProfile;
     } catch (error) {
-      console.error('Error in getOrCreateProfile:', error);
+      console.error('[DEBUG_LOG] Error in getOrCreateProfile:', error);
       throw error;
     }
   },

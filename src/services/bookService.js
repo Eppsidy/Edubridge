@@ -80,7 +80,7 @@ export const bookService = {
 
   /**
    * Get books by seller ID with pagination
-   * @param {string} sellerId - Seller's profile ID
+   * @param {string} sellerId - Seller's user ID (UUID from auth, not profile ID)
    * @param {Object} options - Query options
    * @param {number} options.page - Page number (1-based)
    * @param {number} options.pageSize - Number of items per page
@@ -97,16 +97,16 @@ export const bookService = {
       const to = from + pageSize - 1;
 
       const { data, error, count } = await supabase
-        .from('books')
-        .select(`
-          *,
-          categories:category_id (
-            name
-          )
-        `, { count: 'exact' })
-        .eq('seller_id', sellerId)
-        .order('created_at', { ascending: false })
-        .range(from, to);
+          .from('books')
+          .select(`
+        *,
+        categories:category_id (
+          name
+        )
+      `, { count: 'exact' })
+          .eq('seller_id', sellerId) // This should be the user.id (UUID)
+          .order('created_at', { ascending: false })
+          .range(from, to);
 
       if (error) throw error;
 
@@ -117,7 +117,7 @@ export const bookService = {
         // Standardize price field
         price: book.selling_price || 0,
         listingType: book.selling_price === 0 ? 'donate' : 'sell',
-        status: book.availability_status.toLowerCase()
+        status: book.availability_status?.toLowerCase() || 'available'
       }));
 
       return {

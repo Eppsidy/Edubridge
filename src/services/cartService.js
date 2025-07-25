@@ -74,18 +74,18 @@ export const cartService = {
     }
 
     try {
-      // Check if book is already in cart
-      const { data: existingItem, error: checkError } = await supabase
+      // Check if book is already in cart - Remove .single() to avoid 406 error
+      const { data: existingItems, error: checkError } = await supabase
         .from('cart')
         .select('*')
         .eq('user_id', profileId)
-        .eq('book_id', bookId)
-        .single();
+        .eq('book_id', bookId);
 
-      if (checkError && checkError.code !== 'PGRST116') {
+      if (checkError) {
         throw checkError;
       }
 
+      const existingItem = existingItems && existingItems.length > 0 ? existingItems[0] : null;
       let result;
 
       if (existingItem) {

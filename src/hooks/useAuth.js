@@ -35,8 +35,17 @@ export const useAuth = () => {
    * @returns {boolean} - True if the user is anonymous, false otherwise
    */
   const isAnonymousUser = (session) => {
-    if (!session || !session.user) return false;
-    return !!session.user.user_metadata?.is_anonymous;
+    console.log('[DEBUG_LOG] useAuth: isAnonymousUser called');
+    console.log('[DEBUG_LOG] useAuth: Session exists:', !!session);
+    
+    if (!session || !session.user) {
+      console.log('[DEBUG_LOG] useAuth: No session or user, returning false');
+      return false;
+    }
+    
+    const isAnonymous = !!session.user.user_metadata?.is_anonymous;
+    console.log('[DEBUG_LOG] useAuth: User is anonymous:', isAnonymous);
+    return isAnonymous;
   };
 
   /**
@@ -64,19 +73,28 @@ export const useAuth = () => {
    * @returns {boolean} - True if the user can access the feature, false otherwise
    */
   const checkProtectedAccess = (session, featureName) => {
+    console.log('[DEBUG_LOG] useAuth: checkProtectedAccess called for feature:', featureName);
+    console.log('[DEBUG_LOG] useAuth: Session exists:', !!session);
+    
     // If no session, user needs to log in
     if (!session) {
+      console.log('[DEBUG_LOG] useAuth: No session, redirecting to login');
       redirectToLogin(featureName);
       return false;
     }
 
+    console.log('[DEBUG_LOG] useAuth: Session user ID:', session.user?.id);
+    console.log('[DEBUG_LOG] useAuth: Session user email:', session.user?.email);
+    
     // If user is anonymous, they need to convert to a regular account
     if (isAnonymousUser(session)) {
+      console.log('[DEBUG_LOG] useAuth: User is anonymous, redirecting to login');
       redirectToLogin(featureName);
       return false;
     }
 
     // User is authenticated and not anonymous
+    console.log('[DEBUG_LOG] useAuth: User has access to protected feature:', featureName);
     return true;
   };
 
@@ -85,9 +103,14 @@ export const useAuth = () => {
    * @param {string} featureName - The name of the feature being accessed
    */
   const redirectToLogin = (featureName) => {
+    console.log('[DEBUG_LOG] useAuth: redirectToLogin called for feature:', featureName);
+    
     // Encode the current path and feature name in the URL
     const returnUrl = encodeURIComponent(location.pathname);
     const feature = encodeURIComponent(featureName || '');
+    
+    console.log('[DEBUG_LOG] useAuth: Redirecting to login with returnUrl:', location.pathname);
+    console.log('[DEBUG_LOG] useAuth: Redirecting to login with feature:', featureName || '');
     
     navigate(`/login?returnUrl=${returnUrl}&feature=${feature}`);
   };

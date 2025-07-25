@@ -10,6 +10,11 @@ import Footer from '../components/layout/Footer';
 import '../styles/Cart.css';
 
 // Component code has been moved to separate files
+const getUserName = (session) => {
+  const user = session?.user;
+  const userEmail = user?.email;
+  return user?.user_metadata?.full_name || userEmail?.split('@')[0];
+};
 
 const ShoppingCartPage = ({ session }) => {
   const [cartItems, setCartItems] = useState([]);
@@ -241,7 +246,7 @@ const ShoppingCartPage = ({ session }) => {
 
   return (
     <div className="textbook-market">
-      <Header session={session} />
+      <Header user={session?.user} userName={getUserName(session)} />
       <Navigation activeTab="Cart" />
       
       <main className="main-content">
