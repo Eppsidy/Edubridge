@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
+import { profileService } from '../services/profileService';
 import Header from '../components/layout/Header';
 import Navigation from '../components/layout/Navigation';
 import Footer from '../components/layout/Footer';
@@ -178,46 +179,11 @@ const EduBridgeSale = ({ session }) => {
         throw new Error('Selling price must be greater than 0');
       }
 
-      // Get or create user profile
-      let userProfile;
-      const { data: existingProfile, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (profileError && profileError.code !== 'PGRST116') {
-        throw profileError;
-      }
-
-      if (existingProfile) {
-        userProfile = existingProfile;
-      } else {
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              user_id: user.id,
-              email: user.email,
-              full_name: userName || 'User',
-              course_of_study: 'Not specified'
-            }
-          ])
-          .select('id')
-          .single();
-
-        if (createError) {
-          throw createError;
-        }
-        if (!newProfile) {
-          throw new Error('Failed to create user profile');
-        }
-        userProfile = newProfile;
-      }
-
-      // Ensure we have a valid user profile before proceeding
+      // Get or create user profile using profileService
+      const userProfile = await profileService.getOrCreateProfile(user);
+      
       if (!userProfile || !userProfile.id) {
-        throw new Error('User profile not found');
+        throw new Error('User profile not found. Please log in again.');
       }
 
       const bookData = {
