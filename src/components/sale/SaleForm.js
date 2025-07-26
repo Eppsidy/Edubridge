@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 
 const SaleForm = ({
                     formData,
-                    setFormData,
                     handleInputChange,
                     handleSubmit,
                     categories,
@@ -14,11 +13,14 @@ const SaleForm = ({
                     userProfile
                   }) => {
   const [errors, setErrors] = useState({});
+  const [bookSuggestions, setBookSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const suggestionsRef = useRef(null);
+  const titleInputRef = useRef(null);
 
   const validateForm = (data) => {
     const errors = {};
-
-    // Required fields for both selling and donating
     const requiredFields = ['title', 'author', 'condition_rating', 'category_id'];
 
     requiredFields.forEach(field => {
@@ -27,7 +29,6 @@ const SaleForm = ({
       }
     });
 
-    // Price validation only if listing type is 'sell'
     if (data.listingType === 'sell') {
       if (!data.selling_price || isNaN(data.selling_price) || data.selling_price <= 0) {
         errors.selling_price = 'Please enter a valid price greater than 0';
@@ -37,12 +38,123 @@ const SaleForm = ({
     return errors;
   };
 
+  // Debounce function to limit API calls
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(null, args), delay);
+    };
+  };
+
+  // Search books using Google Books API
+  const searchBooks = async (query) => {
+    if (!query || query.length < 3) {
+      setBookSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setSearchLoading(true);
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=8&fields=items(id,volumeInfo(title,authors,imageLinks,publishedDate,publisher,industryIdentifiers,description))`
+      );
+      
+      if (!response.ok) throw new Error('Failed to fetch books');
+      
+      const data = await response.json();
+      
+      if (data.items) {
+        const suggestions = data.items.map(item => ({
+          id: item.id,
+          title: item.volumeInfo.title || '',
+          authors: item.volumeInfo.authors || [],
+          publisher: item.volumeInfo.publisher || '',
+          publishedDate: item.volumeInfo.publishedDate || '',
+          thumbnail: item.volumeInfo.imageLinks?.thumbnail || item.volumeInfo.imageLinks?.smallThumbnail || '',
+          isbn: item.volumeInfo.industryIdentifiers?.find(id => id.type === 'ISBN_13')?.identifier || 
+                item.volumeInfo.industryIdentifiers?.find(id => id.type === 'ISBN_10')?.identifier || '',
+          description: item.volumeInfo.description || ''
+        }));
+        
+        setBookSuggestions(suggestions);
+        setShowSuggestions(true);
+      } else {
+        setBookSuggestions([]);
+        setShowSuggestions(false);
+      }
+    } catch (error) {
+      console.error('Error searching books:', error);
+      setBookSuggestions([]);
+      setShowSuggestions(false);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  // Debounced search function
+  const debouncedSearch = debounce(searchBooks, 300);
+
+  // Handle title input change with search
+  const handleTitleChange = (e) => {
+    const value = e.target.value;
+    handleInputChange(e);
+    
+    if (value.trim()) {
+      debouncedSearch(value.trim());
+    } else {
+      setBookSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  // Handle book selection from suggestions - Updated to use handleInputChange
+  const handleBookSelect = (book) => {
+    const publishYear = book.publishedDate ? new Date(book.publishedDate).getFullYear() : '';
+    
+    // Create synthetic events to update each field
+    const updateField = (name, value) => {
+      handleInputChange({
+        target: { name, value }
+      });
+    };
+
+    // Update each field individually
+    updateField('title', book.title);
+    updateField('author', book.authors.join(', '));
+    updateField('isbn', book.isbn);
+    updateField('publisher', book.publisher);
+    updateField('publication_year', publishYear.toString());
+    updateField('thumbnail_url', book.thumbnail);
+    
+    // Only update description if it's currently empty
+    if (!formData.description || formData.description.trim() === '') {
+      updateField('description', book.description ? book.description.substring(0, 500) : '');
+    }
+    
+    setShowSuggestions(false);
+    setBookSuggestions([]);
+  };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target) &&
+          titleInputRef.current && !titleInputRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     const validationErrors = validateForm(formData);
 
-    // Check if userProfile exists
     if (!userProfile) {
       validationErrors.general = "User profile not found. Please log in again.";
     }
@@ -52,10 +164,7 @@ const SaleForm = ({
       return;
     }
 
-    // Clear any previous errors
     setErrors({});
-
-    // Call the parent's handleSubmit function
     await handleSubmit(e);
   };
 
@@ -68,17 +177,64 @@ const SaleForm = ({
         {errors.general && <div className="sale-form-error general-error">{errors.general}</div>}
 
         <form onSubmit={handleFormSubmit}>
-          <div className="sale-form-group">
+          <div className="sale-form-group book-search-container">
             <label className="sale-form-label">Book Title *</label>
-            <Input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                placeholder="Enter book title"
-                required
-                disabled={loading}
-            />
+            <div className="book-search-wrapper" ref={titleInputRef}>
+              <Input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleTitleChange}
+                  placeholder="Start typing to search for books..."
+                  required
+                  disabled={loading}
+                  autoComplete="off"
+              />
+              {searchLoading && (
+                <div className="search-loading-indicator">
+                  <span>Searching...</span>
+                </div>
+              )}
+              
+              {showSuggestions && bookSuggestions.length > 0 && (
+                <div className="book-suggestions-dropdown" ref={suggestionsRef}>
+                  {bookSuggestions.map((book) => (
+                    <div
+                      key={book.id}
+                      className="book-suggestion-item"
+                      onClick={() => handleBookSelect(book)}
+                    >
+                      <div className="book-suggestion-image">
+                        {book.thumbnail ? (
+                          <img 
+                            src={book.thumbnail} 
+                            alt={book.title}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div className="book-placeholder" style={{display: book.thumbnail ? 'none' : 'flex'}}>
+                          📚
+                        </div>
+                      </div>
+                      <div className="book-suggestion-details">
+                        <div className="book-suggestion-title">{book.title}</div>
+                        <div className="book-suggestion-author">
+                          by {book.authors.join(', ')}
+                        </div>
+                        {book.publisher && (
+                          <div className="book-suggestion-publisher">
+                            {book.publisher} {book.publishedDate && `(${new Date(book.publishedDate).getFullYear()})`}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             {errors.title && <div className="sale-form-error">{errors.title}</div>}
           </div>
 
@@ -151,12 +307,13 @@ const SaleForm = ({
           </div>
 
           <div className="sale-form-group">
-            <label className="sale-form-label">Category</label>
+            <label className="sale-form-label">Category *</label>
             <select
                 className="sale-form-select"
                 name="category_id"
                 value={formData.category_id}
                 onChange={handleInputChange}
+                required
                 disabled={loading}
             >
               <option value="">Select a category</option>
@@ -166,6 +323,7 @@ const SaleForm = ({
                   </option>
               ))}
             </select>
+            {errors.category_id && <div className="sale-form-error">{errors.category_id}</div>}
           </div>
 
           <div className="sale-form-group">

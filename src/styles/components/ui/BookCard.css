@@ -16,16 +16,44 @@
   box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
 
-.book-image {
-  margin-bottom: 16px;
+.book-card:hover .book-image {
+  transform: scale(1.05);
+}
+
+.book-placeholder,
+.book-placeholder-fallback {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 160px;
-  background: #f9fafb;
+  background-color: #e9ecef;
+  color: #6c757d;
+  font-size: 48px;
+  border-radius: 8px;
+}
+
+.book-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  background-color: white;
+}
+
+.book-image-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  margin-bottom: 12px;
   border-radius: 8px;
   overflow: hidden;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 
 .book-placeholder {
   text-align: center;
@@ -41,45 +69,100 @@
 .book-title {
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  color: #333;
   line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .book-author {
+  color: #666;
   font-size: 14px;
-  color: #6b7280;
   margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .book-details {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  padding: 0 12px 12px;
 }
 
 .book-price {
   font-size: 18px;
-  font-weight: bold;
-  color: #2dd4bf;
+  font-weight: 700;
+  color: #2e7d32;
 }
 
 .book-condition {
-  font-size: 12px;
-  color: #6b7280;
-  background: #f3f4f6;
-  padding: 4px 8px;
-  border-radius: 4px;
+  color: #666;
+  font-weight: 500;
 }
 
 .book-seller {
-  font-size: 12px;
-  color: #6b7280;
-  margin-bottom: 12px;
+  text-align: center;
+  color: #666;
+  font-size: 11px;
 }
 
 .book-actions {
+  margin-bottom: 8px;
+}
+
+.donation-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #28a745;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 1;
+}
+
+.book-info {
   display: flex;
-  gap: 8px;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.book-course {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.book-price-container {
+  margin-bottom: 12px;
+}
+
+.book-free {
+  font-size: 16px;
+  font-weight: 700;
+  color: #28a745;
+}
+
+.buy-button {
+  width: 100%;
+  padding: 8px 16px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.buy-button:hover {
+  background-color: #1565c0;
 }

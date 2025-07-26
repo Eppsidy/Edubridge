@@ -52,13 +52,13 @@ const UserDashboard = ({ session }) => {
         const { data: userBooks, error: booksError } = await supabase
           .from('books')
           .select(`
-        *,
-        categories:category_id (
-          name
-        )
-      `)
-        .eq('seller_id', userProfile.id) // Use userProfile.id instead of user.id
-        .order('created_at', { ascending: false });
+            *,
+            categories:category_id (
+              name
+            )
+          `)
+          .eq('seller_id', userProfile.id) // Use userProfile.id instead of user.id
+          .order('created_at', { ascending: false });
 
       if (booksError) throw booksError;
 

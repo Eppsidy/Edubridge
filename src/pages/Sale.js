@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
 import { profileService } from '../services/profileService';
-import { bookService } from '../services/bookService';
 import Header from '../components/layout/Header';
 import Navigation from '../components/layout/Navigation';
 import Footer from '../components/layout/Footer';
@@ -13,6 +12,7 @@ import DeleteModal from '../components/sale/DeleteModal';
 import '../styles/components/sale/index.css';
 import '../styles/components/sale/BookCard.css';
 import '../styles/components/sale/Layout.css';
+import '../styles/components/sale/Booksuggestion.css';
 
 /**
  * Sale page component for listing books
@@ -48,7 +48,8 @@ const EduBridgeSale = ({ session }) => {
     selling_price: '',
     condition_rating: 'Good',
     description: '',
-    listingType: 'sell'
+    listingType: 'sell',
+    thumbnail_url: ''
   });
   
   // Add state for user profile
@@ -57,12 +58,13 @@ const EduBridgeSale = ({ session }) => {
   // Move fetchUserListings outside useEffect so it can be called from handleSubmit
   const fetchUserListings = async () => {
     if (!user) return;
-    
+
     try {
       setLoading(true);
-      
+
       // Get or create user profile using profileService
       const profile = await profileService.getOrCreateProfile(user);
+      console.log('[DEBUG_LOG] Sale.js: fetchUserListings - Profile:', profile);
       setUserProfile(profile);
 
       if (!profile?.id) {
@@ -71,23 +73,33 @@ const EduBridgeSale = ({ session }) => {
 
       // Fetch books listed by this user using profile ID
       const { data: userBooks, error: booksError } = await supabase
-        .from('books')
-        .select(`
+          .from('books')
+          .select(`
           *,
           categories:category_id (
             name
+          ),
+          seller_profile:seller_id (
+            full_name,
+            course_of_study,
+            email
           )
         `)
-        .eq('seller_id', profile.id) // Use profile.id instead of user.id
-        .order('created_at', { ascending: false });
+          .eq('seller_id', profile.id) // Use profile.id instead of user.id
+          .order('created_at', { ascending: false });
 
       if (booksError) throw booksError;
+
+      console.log('[DEBUG_LOG] Sale.js: fetchUserListings - User books:', userBooks);
 
       setListings(userBooks.map(book => ({
         ...book,
         subject: book.categories?.name || 'Other',
         listingType: book.selling_price === 0 ? 'donate' : 'sell',
-        status: book.availability_status.toLowerCase()
+        status: book.availability_status.toLowerCase(),
+        seller: book.seller_profile?.full_name ||
+            book.seller_profile?.email?.split('@')[0] ||
+            'Unknown Seller'
       })));
     } catch (err) {
       console.error('Error fetching listings:', err);
@@ -170,7 +182,7 @@ const EduBridgeSale = ({ session }) => {
     setError(null);
     setSuccessMsg('');
     setLoading(true);
-    
+
     console.log('[DEBUG_LOG] Sale.js: handleSubmit called');
 
     try {
@@ -198,68 +210,122 @@ const EduBridgeSale = ({ session }) => {
         console.log('[DEBUG_LOG] Sale.js: User session is null or undefined');
         throw new Error('User session expired. Please log in again.');
       }
-      
+
       // Check if userProfile exists (already fetched in useEffect)
       if (!userProfile || !userProfile.id) {
         console.log('[DEBUG_LOG] Sale.js: User profile not found or has no ID');
         throw new Error('User profile not found. Please log in again.');
       }
-      
-      console.log('[DEBUG_LOG] Sale.js: Using user ID:', user.id, 'Profile ID:', userProfile.id);
 
-      console.log('[DEBUG_LOG] Sale.js: Creating book data with profile ID:', userProfile.id);
+      console.log('[DEBUG_LOG] Sale.js: Using user ID:', user.id, 'Profile ID:', userProfile.id);
+      console.log('[DEBUG_LOG] Sale.js: User profile details:', userProfile);
+
+      // Find the category by name if category_id is not a valid UUID
+      let categoryId = formData.category_id;
+
+      // Check if category_id is empty or not a valid UUID format
+      if (!categoryId || !categoryId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)) {
+        console.log('[DEBUG_LOG] Sale.js: Invalid category_id format, finding by name or using default');
+
+        // If no category selected, use "Other" as default
+        const categoryName = categoryId || 'Other';
+
+        // Find the category by name
+        const selectedCategory = categories.find(cat =>
+            cat.name === categoryName || cat.id === categoryId
+        );
+
+        if (selectedCategory) {
+          categoryId = selectedCategory.id;
+        } else {
+          // Find "Other" category as fallback
+          const otherCategory = categories.find(cat => cat.name === 'Other');
+          if (otherCategory) {
+            categoryId = otherCategory.id;
+          } else {
+            throw new Error('No valid category found. Please select a category.');
+          }
+        }
+      }
+
+      console.log('[DEBUG_LOG] Sale.js: Creating book data with profile ID:', userProfile.id, 'and category ID:', categoryId);
+
       const bookData = {
         title: formData.title.trim(),
         author: formData.author.trim(),
-        isbn: formData.isbn.trim() || null,
-        edition: formData.edition.trim() || null,
-        publisher: formData.publisher.trim() || null,
-        publication_year: formData.publication_year ? parseInt(formData.publication_year) : null,
-        category_id: formData.category_id ? parseInt(formData.category_id) : null,
-        seller_id: userProfile.id, // Use userProfile.id (integer) instead of user.id (UUID)
-        selling_price: formData.listingType === 'sell' ? parseFloat(formData.selling_price) : 0,
+        isbn: formData.isbn?.trim() || null,
+        edition: formData.edition?.trim() || null,
+        publisher: formData.publisher?.trim() || null,
+        publication_year: formData.publication_year?.trim() || null,
+        category_id: categoryId, // Use the validated UUID
+        seller_id: userProfile.id, // Use profile ID (which is a UUID)
+        selling_price: formData.listingType === 'donate' ? 0 : parseFloat(formData.selling_price) || 0,
         condition_rating: formData.condition_rating,
-        description: formData.description.trim() || null,
-        availability_status: 'Available'
+        description: formData.description?.trim() || null,
+        availability_status: 'Available',
+        thumbnail_url: formData.thumbnail_url?.trim() || null,
       };
 
+      console.log('[DEBUG_LOG] Sale.js: Book data to insert:', bookData);
+
+      let result;
       if (editingIndex >= 0) {
-        const { error: updateError } = await supabase
-          .from('books')
-          .update(bookData)
-          .eq('id', listings[editingIndex].id);
+        // Update existing book
+        const bookToUpdate = listings[editingIndex];
+        const { data, error } = await supabase
+            .from('books')
+            .update(bookData)
+            .eq('id', bookToUpdate.id)
+            .eq('seller_id', userProfile.id) // Security check
+            .select(`
+              *,
+              categories:category_id (
+                name
+              ),
+              seller_profile:seller_id (
+                full_name,
+                course_of_study,
+                email
+              )
+            `)
+            .single();
 
-        if (updateError) throw updateError;
-      
-        // Re-fetch all listings to get the updated data with proper structure
-        await fetchUserListings();
-        setEditingIndex(-1);
+        if (error) throw error;
+        result = data;
+        setSuccessMsg('Book updated successfully!');
       } else {
-        const { data: newBook, error: insertError } = await supabase
-          .from('books')
-          .insert([bookData])
-          .select(`
-            *,
-            categories:category_id (
-              name
-            )
-          `)
-          .single();
+        // Create new book
+        const { data, error } = await supabase
+            .from('books')
+            .insert([bookData])
+            .select(`
+              *,
+              categories:category_id (
+                name
+              ),
+              seller_profile:seller_id (
+                full_name,
+                course_of_study,
+                email
+              )
+            `)
+            .single();
 
-        if (insertError) throw insertError;
-      
-        // Transform the new book to match the expected structure
-        const transformedBook = {
-          ...newBook,
-          subject: newBook.categories?.name || 'Other',
-          listingType: newBook.selling_price === 0 ? 'donate' : 'sell',
-          status: newBook.availability_status.toLowerCase()
-        };
-      
-        setListings([transformedBook, ...listings]);
+        if (error) {
+          console.error('[DEBUG_LOG] Sale.js: Database insert error:', error);
+          throw error;
+        }
+
+        result = data;
+        console.log('[DEBUG_LOG] Sale.js: Book created successfully:', result);
+        setSuccessMsg('Book listed successfully!');
+
+        // Set flag for market refresh
+        localStorage.setItem('edubridge_book_added', 'true');
+        localStorage.setItem('edubridge_book_added_timestamp', Date.now().toString());
       }
 
-      setSuccessMsg('Book listed successfully!');
+      // Reset form
       setFormData({
         title: '',
         author: '',
@@ -271,11 +337,21 @@ const EduBridgeSale = ({ session }) => {
         selling_price: '',
         condition_rating: 'Good',
         description: '',
-        listingType: 'sell'
+        listingType: 'sell',
+        thumbnail_url: ''
       });
-    } catch (err) {
-      console.error('Error managing book:', err);
-      setError(err.message || 'Error managing book listing. Please try again.');
+
+      setEditingIndex(-1);
+
+      // Refresh listings
+      await fetchUserListings();
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMsg(''), 3000);
+
+    } catch (error) {
+      console.error('[DEBUG_LOG] Sale.js: Error in handleSubmit:', error);
+      setError(error.message || 'Error managing book. Please try again.');
     } finally {
       setLoading(false);
     }
