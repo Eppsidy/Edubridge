@@ -420,8 +420,8 @@ const EduBridgeSale = ({ session }) => {
 
       <div className="sale-content-container">
         <div className="page-header">
-          <h1 className="page-title">Sell Your Textbooks</h1>
-          <p className="page-subtitle">Turn your unused textbooks into cash or help fellow students by donating</p>
+          <h1 className="page-title-sale">Sell Your Textbooks</h1>
+          <p className="page-subtitle-sale">Turn your unused textbooks into cash or help fellow students by donating</p>
         </div>
 
         {error && <div className="error-message">{error}</div>}
