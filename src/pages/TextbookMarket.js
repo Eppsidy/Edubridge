@@ -12,6 +12,8 @@ import { profileService } from '../services/profileService';
 import { bookService } from '../services/bookService';
 import { cartService } from '../services/cartService';
 import '../styles/TextbookMarket.css';
+import '../styles/common.css';
+import '../styles/variables.css';
 
 const getUserName = (session) => {
   const user = session?.user;

@@ -89,6 +89,7 @@ Stores textbook listings.
 | description         | TEXT          | Book description                      |
 | availability_status | TEXT          | Status (Available, Sold)              |
 | seller_id           | UUID          | Foreign key to profiles               |
+| thumbnail_url       | TEXT          | URL to book cover image               |
 | created_at          | TIMESTAMP     | Creation timestamp                    |
 | updated_at          | TIMESTAMP     | Last update timestamp                 |
 

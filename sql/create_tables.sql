@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS books (
     description TEXT,
     availability_status TEXT NOT NULL DEFAULT 'Available',
     seller_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    thumbnail_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

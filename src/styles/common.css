@@ -1,5 +1,5 @@
 /* Common styles for EduBridge application */
-@import './variables.css';
+@import '../styles/variables.css';
 
 /* Layout */
 .content-container {

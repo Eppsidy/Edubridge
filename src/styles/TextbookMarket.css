@@ -1,4 +1,4 @@
-@import './common.css';
+@import '../styles/common.css';
 
 .textbook-market {
   min-height: 100vh;
