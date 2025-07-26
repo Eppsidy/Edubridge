@@ -144,7 +144,7 @@ const TextbookMarket = ({ session }) => {
       <Header user={session?.user} userName={getUserName(session)} />
       <Navigation activeTab="Market" />
       
-      <main className="main-content">
+      <main className="content-container">
         <div className="content-card">
           <div className="page-header">
             <h1 className="page-title">Textbook Market</h1>
@@ -169,7 +169,7 @@ const TextbookMarket = ({ session }) => {
           {loading ? (
             <div className="loading">Loading books...</div>
           ) : (
-            <div className="books-grid">
+            <div className="grid books-grid">
               {books.map(book => (
                 <BookCard 
                   key={book.id} 

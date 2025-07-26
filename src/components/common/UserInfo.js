@@ -1,4 +1,5 @@
 import React from 'react';
+import '../../styles/components/common/UserInfo.css';
 
 const UserInfo = ({ userName }) => {
   if (!userName) return null;

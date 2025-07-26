@@ -25,12 +25,6 @@ const HeroSection = ({ userName, onLogout, onSearch }) => {
           <br />
           Your Student-Powered Learning Hub!
         </h2>
-
-        <SearchBar 
-          placeholder="Search textbooks..."
-          onSearch={onSearch}
-        />
-
         <div 
           className="hero-image" 
           style={{

@@ -27,7 +27,6 @@ const Home = ({ session }) => {
         <HeroSection 
           userName={userName} 
           onLogout={handleLogout}
-          onSearch={handleSearch}
         />
         <FeaturesSection />
       </div>

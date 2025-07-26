@@ -15,6 +15,10 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .content-wrapper {
+    padding: 16px 8px;
+  }
+  
   .home-container {
     /* Additional page-specific mobile styles */
   }

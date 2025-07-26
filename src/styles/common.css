@@ -1,0 +1,93 @@
+/* Common styles for EduBridge application */
+@import './variables.css';
+
+/* Layout */
+.content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-md);
+}
+
+.content-card {
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* Typography */
+.page-header {
+  margin-bottom: var(--spacing-lg);
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.page-subtitle {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+/* Grids */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Messages */
+.error-message {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.success-message {
+  background: #dcfce7;
+  color: #15803d;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.loading {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--text-secondary);
+}
+
+.no-results {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .content-container {
+    padding: var(--spacing-sm);
+  }
+  
+  .content-card {
+    padding: var(--spacing-md);
+  }
+  
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xs);
+  }
+}

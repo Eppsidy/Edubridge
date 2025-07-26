@@ -1,43 +1,19 @@
+@import './common.css';
+
 .textbook-market {
   min-height: 100vh;
-  background: #f9fafb;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding-bottom: 60px;
 }
 
-.main-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-}
+/* Using common styles from common.css:
+ * .main-content -> .content-container
+ * .content-card -> .content-card
+ * .page-header, .page-title, .page-subtitle -> same names
+ */
 
-.content-card {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.page-header {
-  margin-bottom: 32px;
-}
-
-.page-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: #1f2937;
-  margin-bottom: 8px;
-}
-
-.page-subtitle {
-  color: #6b7280;
-  font-size: 16px;
-}
-
+/* Using .grid from common.css with additional styling */
 .books-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-  margin-bottom: 24px;
   padding-top: 20px;
 }
 .book-card {
@@ -117,16 +93,13 @@
   margin-bottom: 24px;
 }
 
-.footer {
-  text-align: center;
-  padding: 2rem;
-  color: rgba(0, 0, 0, 0.8);
-  margin-top: 3rem;
-}
-
 @media (max-width: 768px) {
   .main-content {
-    padding: 16px;
+    padding: 16px 8px;
+  }
+  
+  .content-container {
+    padding: 8px;
   }
   
   .content-card {

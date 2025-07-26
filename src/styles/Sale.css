@@ -1,4 +1,7 @@
 /* Sale.css */
+.min-h-screen.bg-gray-50 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
 .sale-content-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -12,12 +15,12 @@
 .page-title {
   font-size: 24px;
   font-weight: bold;
-  color: #1f2937;
+  color: white;
   margin-bottom: 8px;
 }
 
 .page-subtitle {
-  color: #6b7280;
+  color: white;
   font-size: 16px;
 }
 
@@ -388,7 +391,7 @@
 
 @media (max-width: 768px) {
   .sale-content-container {
-    padding: 16px;
+    padding: 16px 8px;
   }
 
   .sale-form,

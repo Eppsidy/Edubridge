@@ -13,6 +13,7 @@ import '../styles/components/sale/index.css';
 import '../styles/components/sale/BookCard.css';
 import '../styles/components/sale/Layout.css';
 import '../styles/components/sale/Booksuggestion.css';
+import '../styles/Sale.css';
 
 /**
  * Sale page component for listing books

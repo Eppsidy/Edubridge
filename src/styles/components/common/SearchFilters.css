@@ -2,11 +2,12 @@
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
+  align-items: center;
 }
 
 .search-bar {
   flex: 1;
-  min-width: 300px;
+  min-width: 450px;
   position: relative;
 }
 

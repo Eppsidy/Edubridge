@@ -2,6 +2,6 @@
 .footer {
   text-align: center;
   padding: var(--spacing-lg);
-  color: var(--text-light);
+  color: #008080;
   margin-top: var(--spacing-xl);
 }
